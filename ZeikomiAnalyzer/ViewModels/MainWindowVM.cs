@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using WordPressPCL.Models;
 using ZeikomiAnalyzer.Common.Config;
 using ZeikomiAnalyzer.Models;
@@ -117,6 +119,34 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region 実行中フラグ[IsExecute]プロパティ
+        /// <summary>
+        /// 実行中フラグ[IsExecute]プロパティ用変数
+        /// </summary>
+        bool _IsExecute = false;
+        /// <summary>
+        /// 実行中フラグ[IsExecute]プロパティ
+        /// </summary>
+        public bool IsExecute
+        {
+            get
+            {
+                return _IsExecute;
+            }
+            set
+            {
+                if (!_IsExecute.Equals(value))
+                {
+                    _IsExecute = value;
+                    NotifyPropertyChanged("IsExecute");
+                }
+            }
+        }
+        #endregion
+
+
+
+        #region 初期化処理
         /// <summary>
         /// 初期化処理
         /// </summary>
@@ -142,7 +172,9 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+        #endregion
 
+        #region 画面を閉じる
         /// <summary>
         /// 画面を閉じる
         /// </summary>
@@ -161,6 +193,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+        #endregion
 
         #region 全記事の取得
         /// <summary>
@@ -171,6 +204,7 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
+                this.IsExecute = true;
                 // 一旦削除
                 this.Articles.Clear();
 
@@ -181,6 +215,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 //// 固定ページ一覧の取得
                 var pages = await WordpressAPI.WpClient.Pages.GetAll();
                 this.Articles.Add(new List<Page>(pages));
+                this.IsExecute = false;
             }
             catch (Exception e)
             {
@@ -188,6 +223,8 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
         #endregion
+
+        #region 記事の取得
         /// <summary>
         /// 記事の取得
         /// </summary>
@@ -202,6 +239,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+        #endregion
 
         #region GoogleAnalyticsの結果を開く
         /// <summary>
@@ -220,7 +258,9 @@ namespace ZeikomiAnalyzer.ViewModels
                 // ダイアログを表示する
                 if (dialog.ShowDialog() == true)
                 {
+                    this.IsExecute = true;
                     GetAnalytics(dialog.FileName, "データセット1");
+                    this.IsExecute = false;
                 }
             }
             catch (Exception e)
@@ -238,65 +278,89 @@ namespace ZeikomiAnalyzer.ViewModels
         /// <param name="sheet_name">シート名</param>
         private void GetAnalytics(string path, string sheet_name)
         {
-            // 一旦削除
-            this.AnalyticsList.Clear();
-
-            List<string> col_list = new List<string>();
-            // 読み取り専用で開く
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            Task.Run(() =>
             {
-                // Bookの操作
-                using (XLWorkbook book = new XLWorkbook(fs, XLEventTracking.Disabled))
+                try
                 {
-                    var sheet = (from x in book.Worksheets
-                                 where x.Name.Equals(sheet_name)
-                                 select x).FirstOrDefault();
+                    GoogleAnalyticsCollectionM tmp = new GoogleAnalyticsCollectionM();
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
 
-                    // シートが見つからない場合
-                    if (sheet == null)
-                        return;
+                           this.IsExecute = true;
+                       }));
 
-                    // ヘッダ情報の抜き出し
-                    for (int col = 1; ; col++)
+                    List<string> col_list = new List<string>();
+                    // 読み取り専用で開く
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
-                        object cell_val = sheet.Cell(1, col).Value; // ヘッダの文字列取得
+                        // Bookの操作
+                        using (XLWorkbook book = new XLWorkbook(fs, XLEventTracking.Disabled))
+                        {
+                            var sheet = (from x in book.Worksheets
+                                         where x.Name.Equals(sheet_name)
+                                         select x).FirstOrDefault();
 
-                        // nullチェックと空文字チェック
-                        if (cell_val != null && !string.IsNullOrEmpty(cell_val.ToString()))
-                        {
-                            // ヘッダとして文字列が存在するのでカラムリストに追加
-                            col_list.Add(cell_val.ToString());
-                        }
-                        else
-                        {
-                            // ヘッダの存在しないところに来たので抜ける
-                            break;
+                            // シートが見つからない場合
+                            if (sheet == null)
+                                return;
+
+                            // ヘッダ情報の抜き出し
+                            for (int col = 1; ; col++)
+                            {
+                                object cell_val = sheet.Cell(1, col).Value; // ヘッダの文字列取得
+
+                                // nullチェックと空文字チェック
+                                if (cell_val != null && !string.IsNullOrEmpty(cell_val.ToString()))
+                                {
+                                    // ヘッダとして文字列が存在するのでカラムリストに追加
+                                    col_list.Add(cell_val.ToString());
+                                }
+                                else
+                                {
+                                    // ヘッダの存在しないところに来たので抜ける
+                                    break;
+                                }
+                            }
+
+
+                            int row = 2;    // 先頭行はヘッダとして扱う
+
+                            // ループ
+                            while (true)
+                            {
+                                // 行データを分解して取り出し
+                                GoogleAnalyticsM item = new GoogleAnalyticsM(sheet.Row(row++), col_list);
+
+                                // 空文字チェック
+                                if (!string.IsNullOrWhiteSpace(item.Page))
+                                {
+                                    // データが存在するので登録
+                                    tmp.GoogleAnalyticsItems.Items.Add(item);
+                                }
+                                else
+                                {
+                                    // データが存在しないので抜ける
+                                    break;
+                                }
+                            }
                         }
                     }
 
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
+                            // データのセット
+                            this.AnalyticsList = tmp;
+                            this.IsExecute = false;
+                       }));
 
-                    int row = 2;    // 先頭行はヘッダとして扱う
-
-                    // ループ
-                    while (true)
-                    {
-                        // 行データを分解して取り出し
-                        GoogleAnalyticsM item = new GoogleAnalyticsM(sheet.Row(row++), col_list);
-
-                        // 空文字チェック
-                        if (!string.IsNullOrWhiteSpace(item.Page))
-                        {
-                            // データが存在するので登録
-                            this.AnalyticsList.GoogleAnalyticsItems.Items.Add(item);
-                        }
-                        else
-                        {
-                            // データが存在しないので抜ける
-                            break;
-                        }
-                    }
                 }
-            }
+                catch (Exception e)
+                {
+                    ShowMessage.ShowErrorOK(e.Message, "Error");
+                }
+            });
         }
         #endregion
 
