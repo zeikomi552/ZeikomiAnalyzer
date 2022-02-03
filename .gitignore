@@ -3,3 +3,7 @@
 ################################################################################
 
 /MVVMCore/bin/Debug/net5.0-windows
+/MVVMCore/obj
+/ZeikomiAnalyzer/bin/Debug/net5.0-windows
+/ZeikomiAnalyzer/obj
+/.vs/ZeikomiAnalyzer/v16
