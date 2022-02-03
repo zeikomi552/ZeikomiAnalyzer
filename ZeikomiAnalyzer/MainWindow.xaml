@@ -2,12 +2,19 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:hlp="clr-namespace:ZeikomiAnalyzer.Common.Helpers"
+        xmlns:Converters="clr-namespace:ZeikomiAnalyzer.Common.Converters"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:ZeikomiAnalyzer"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:ViewModels="clr-namespace:ZeikomiAnalyzer.ViewModels" x:Class="ZeikomiAnalyzer.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
+    <mah:MetroWindow.Resources>
+        <Converters:boolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
+        <Converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <Converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </mah:MetroWindow.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
             <b:CallMethodAction TargetObject="{Binding}" MethodName="Init"/>
@@ -32,17 +39,26 @@
             <GroupBox Margin="5" Header="WordPress">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="90" Text="URL" Margin="5"/>
+                        <TextBlock TextAlignment="Right" Margin="5" Width="90" VerticalAlignment="Center" Text="URL"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
                         <TextBox Width="250" Text="{Binding Config.Url}" Margin="5"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="90" Text="ユーザーアカウント" Margin="5"/>
+                        <TextBlock TextAlignment="Right" Margin="5" Width="90" VerticalAlignment="Center" Text="ユーザーアカウント"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
                         <TextBox Width="250" Text="{Binding Config.UserAccount}" Margin="5"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="90" Text="パスワード" Margin="5"/>
-                        <TextBox Width="250" Text="{Binding Config.Password}" Margin="5"/>
+                        <TextBlock TextAlignment="Right" Margin="5" Width="90" VerticalAlignment="Center" Text="パスワード"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <Grid>
+                            <TextBox Margin="5" Visibility="{Binding IsChecked, Converter={StaticResource boolToVisibilityConverter}, ElementName=toggleButton2}" VerticalAlignment="Center" Width="150" Text="{Binding Config.Password}" Cursor="IBeam"/>
+                            <PasswordBox Width="150" hlp:PasswordBoxHelper.IsAttached="True" hlp:PasswordBoxHelper.Password="{Binding Config.Password}" 
+                                             Margin="5" VerticalAlignment="Center" Cursor="IBeam" Visibility="{Binding IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}, ElementName=toggleButton2}"/>
+                        </Grid>
+                        <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton2" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
                     </StackPanel>
+
                     <StackPanel Orientation="Horizontal">
                         <Button Margin="5" Width="100" Content="記事取得">
                             <b:Interaction.Triggers>
@@ -64,7 +80,6 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </Button>
-                        <TextBox Width="250" Margin="5" IsReadOnly="True" Background="WhiteSmoke"/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
