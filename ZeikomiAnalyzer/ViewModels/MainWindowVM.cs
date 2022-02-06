@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using WordPressPCL.Models;
+using ZeikomiAnalyzer.Common;
 using ZeikomiAnalyzer.Common.Config;
 using ZeikomiAnalyzer.Models;
 
@@ -23,7 +24,7 @@ namespace ZeikomiAnalyzer.ViewModels
         /// <summary>
         /// コンフィグ情報[Config]プロパティ用変数
         /// </summary>
-        ZeikomiAnalyzerConfigM _Config = new ZeikomiAnalyzerConfigM();
+        static ZeikomiAnalyzerConfigM _Config = new ZeikomiAnalyzerConfigM();
         /// <summary>
         /// コンフィグ情報[Config]プロパティ
         /// </summary>
@@ -31,13 +32,13 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             get
             {
-                return _Config;
+                return CommonValues.GetInstance().Config;
             }
             set
             {
-                if (_Config == null || !_Config.Equals(value))
+                if (CommonValues.GetInstance().Config == null || !CommonValues.GetInstance().Config.Equals(value))
                 {
-                    _Config = value;
+                    CommonValues.GetInstance().Config = value;
                     NotifyPropertyChanged("Config");
                 }
             }
@@ -140,6 +141,31 @@ namespace ZeikomiAnalyzer.ViewModels
                 {
                     _IsExecute = value;
                     NotifyPropertyChanged("IsExecute");
+                }
+            }
+        }
+        #endregion
+
+        #region タイトル編集用オブジェクト[ETitle]プロパティ
+        /// <summary>
+        /// タイトル編集用オブジェクト[ETitle]プロパティ用変数
+        /// </summary>
+        EditTitleM _ETitle = new EditTitleM();
+        /// <summary>
+        /// タイトル編集用オブジェクト[ETitle]プロパティ
+        /// </summary>
+        public EditTitleM ETitle
+        {
+            get
+            {
+                return _ETitle;
+            }
+            set
+            {
+                if (_ETitle == null || !_ETitle.Equals(value))
+                {
+                    _ETitle = value;
+                    NotifyPropertyChanged("ETitle");
                 }
             }
         }
@@ -448,6 +474,8 @@ namespace ZeikomiAnalyzer.ViewModels
         #endregion
 
 
+
+
         public void RowDoubleClick()
         {
             try
@@ -465,6 +493,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+
 
         public void SaveExcel()
         {
@@ -486,6 +515,7 @@ namespace ZeikomiAnalyzer.ViewModels
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数(タグ除外)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル文字数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページビュー数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページ別訪問数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "平均滞在時間";
@@ -493,6 +523,8 @@ namespace ZeikomiAnalyzer.ViewModels
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "直帰率";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "離脱率";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページの価値";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル長チェック";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトルキーワード";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL";
 
                     foreach (var tmp in this.CombineData.CombineDataList.Items)
@@ -503,6 +535,7 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Title;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength2;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.TitleLength;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageView;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.UniquePageView;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.StayTime;
@@ -510,11 +543,28 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.ReturnRatio;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.LeaveRatio;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageValue;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.LengthCheck;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.KeywordCheck;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Link;
                     }
 
                     book.SaveAs(dialog.FileName);
 
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+        public void SetTitle()
+        {
+            try
+            {
+                if( this.CombineData.CombineDataList.SelectedItem != null)
+                {
+                    this.ETitle.Title = this.CombineData.CombineDataList.SelectedItem.WordPress.Title;
                 }
             }
             catch (Exception e)

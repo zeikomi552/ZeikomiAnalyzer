@@ -6,11 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WordPressPCL.Models;
+using ZeikomiAnalyzer.Common;
 
 namespace ZeikomiAnalyzer.Models
 {
-    public class ArticleM : ModelBase
-    {
+	public class ArticleM : ModelBase
+	{
 		#region ID[Id]プロパティ
 		/// <summary>
 		/// ID[Id]プロパティ用変数
@@ -56,6 +57,8 @@ namespace ZeikomiAnalyzer.Models
 				{
 					_Title = value;
 					NotifyPropertyChanged("Title");
+					NotifyPropertyChanged("LengthCheck");
+					NotifyPropertyChanged("KeywordCheck");
 				}
 			}
 		}
@@ -81,12 +84,21 @@ namespace ZeikomiAnalyzer.Models
 				{
 					_Contents = value;
 					NotifyPropertyChanged("Contents");
+					NotifyPropertyChanged("ContentsEx");
 					NotifyPropertyChanged("ContentLength");
 					NotifyPropertyChanged("ContentLength2");
 				}
 			}
 		}
 		#endregion
+
+		public string ContentsEx
+		{
+			get
+            {
+				return Regex.Replace(this.Contents, "<[^>]*?>", "");
+			}
+		}
 
 		#region リンク[Link]プロパティ
 		/// <summary>
@@ -113,6 +125,10 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region 記事の長さ
+		/// <summary>
+		/// 記事の長さ
+		/// </summary>
 		public int ContentLength
         {
 			get
@@ -120,7 +136,12 @@ namespace ZeikomiAnalyzer.Models
 				return this.Contents.Length;
 			}
         }
+		#endregion
 
+		#region 記事の長さ(htmlタグを除いたもの)
+		/// <summary>
+		/// 記事の長さ(htmlタグを除いたもの)
+		/// </summary>
 		public int ContentLength2
         {
 			get
@@ -129,6 +150,59 @@ namespace ZeikomiAnalyzer.Models
 				return text.Length;
 			}
         }
+		#endregion
 
-    }
+		#region タイトルの長さ
+		/// <summary>
+		/// タイトルの長さ
+		/// </summary>
+		public int TitleLength
+        {
+            get
+            {
+				return Title.Length;
+            }
+
+        }
+		#endregion
+
+		#region タイトルの長さチェック(true:OK false:NG)[LengthCheck]プロパティ
+		/// <summary>
+		/// タイトルの長さチェック(true:OK false:NG)[LengthCheck]プロパティ
+		/// </summary>
+		public bool LengthCheck
+		{
+			get
+			{
+				if (this.Title.Length >= CommonValues.GetInstance().Config.TitleLengthMin
+					&& this.Title.Length <= CommonValues.GetInstance().Config.TitleLengthMax)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+		}
+		#endregion
+
+		#region タイトル内に含まれるキーワードチェック結果(true:OK false:NG)[KeywordCheck]プロパティ
+		/// <summary>
+		/// タイトル内に含まれるキーワードチェック結果(true:OK false:NG)[KeywordCheck]プロパティ
+		/// </summary>
+		public bool KeywordCheck
+		{
+			get
+			{
+				return (from x in CommonValues.GetInstance().Config.KeywordList.Items
+						   where this.Title.Contains(x.Keyword)
+						   select x).Any();
+			}
+		}
+		#endregion
+
+
+	}
 }

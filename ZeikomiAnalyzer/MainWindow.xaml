@@ -11,6 +11,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
     <mah:MetroWindow.Resources>
+        <Converters:boolToMaruBatsuConverter x:Key="boolToMaruBatsuConverter"/>
         <Converters:boolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
         <Converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         <Converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
@@ -100,35 +101,86 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Header="詳細">
-                                    <DataGrid IsReadOnly="True" AutoGenerateColumns="False"
-                                      ItemsSource="{Binding CombineData.CombineDataList.Items}"
-                                      SelectedItem="{Binding CombineData.CombineDataList.SelectedItem}" Margin="5">
-                                        <b:Interaction.Triggers>
-                                            <b:EventTrigger EventName="MouseDoubleClick">
-                                                <b:CallMethodAction MethodName="RowDoubleClick" TargetObject="{Binding}"/>
-                                            </b:EventTrigger>
-                                        </b:Interaction.Triggers>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="5" VerticalAlignment="Center" Width="80" Text="タイトルお試し"/>
+                                                <TextBox Margin="5" Width="500" Text="{Binding ETitle.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="5" Text="文字数:"/>
+                                                <TextBlock Margin="5" Text="{Binding ETitle.TitleLength}"/>
+                                                <TextBlock Margin="5" Text="文字数判定:"/>
+                                                <TextBlock Margin="5" Text="{Binding ETitle.LengthCheck, Converter={StaticResource boolToMaruBatsuConverter}}"/>
+                                                <TextBlock Margin="5" Text="キーワード判定"/>
+                                                <TextBlock Margin="5" Text="{Binding ETitle.KeywordCheck, Converter={StaticResource boolToMaruBatsuConverter}}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <DataGrid Grid.Row="1" IsReadOnly="True" AutoGenerateColumns="False"
+                                              ItemsSource="{Binding CombineData.CombineDataList.Items}"
+                                              SelectedItem="{Binding CombineData.CombineDataList.SelectedItem}" Margin="5,5,5,5" Grid.RowSpan="2">
+                                            <b:Interaction.Triggers>
+                                                <b:EventTrigger EventName="MouseDoubleClick">
+                                                    <b:CallMethodAction MethodName="RowDoubleClick" TargetObject="{Binding}"/>
+                                                </b:EventTrigger>
+                                                <b:EventTrigger EventName="SelectionChanged">
+                                                    <b:CallMethodAction MethodName="SetTitle" TargetObject="{Binding}"/>
+                                                </b:EventTrigger>
+                                            </b:Interaction.Triggers>
 
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="ID" Binding="{Binding WordPress.Id}"/>
-                                            <DataGridTextColumn Header="タイトル" Binding="{Binding WordPress.Title}"/>
-                                            <DataGridTextColumn Header="文字数" Binding="{Binding WordPress.ContentLength, Mode=OneWay}"/>
-                                            <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding WordPress.ContentLength2, Mode=OneWay}"/>
-                                            <DataGridTextColumn Header="ページビュー" Binding="{Binding Analytics.PageView}"/>
-                                            <DataGridTextColumn Header="平均滞在時間" Binding="{Binding Analytics.StayTime}"/>
-                                            <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Analytics.PageViewStart}"/>
-                                            <DataGridTextColumn Header="直帰率" Binding="{Binding Analytics.ReturnRatio}"/>
-                                            <DataGridTextColumn Header="離脱率" Binding="{Binding Analytics.LeaveRatio}"/>
-                                            <DataGridTextColumn Header="ページの価値" Binding="{Binding Analytics.PageValue}"/>
-                                            <DataGridTextColumn Header="URL" Binding="{Binding WordPress.Link}"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="ID" Binding="{Binding WordPress.Id}"/>
+                                                <DataGridTextColumn Header="タイトル" Binding="{Binding WordPress.Title}"/>
+                                                <DataGridTextColumn Header="文字数" Binding="{Binding WordPress.ContentLength, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding WordPress.ContentLength2, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="タイトル文字数" Binding="{Binding WordPress.TitleLength, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="ページビュー" Binding="{Binding Analytics.PageView}"/>
+                                                <DataGridTextColumn Header="平均滞在時間" Binding="{Binding Analytics.StayTime}"/>
+                                                <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Analytics.PageViewStart}"/>
+                                                <DataGridTextColumn Header="直帰率" Binding="{Binding Analytics.ReturnRatio}"/>
+                                                <DataGridTextColumn Header="離脱率" Binding="{Binding Analytics.LeaveRatio}"/>
+                                                <DataGridTextColumn Header="ページの価値" Binding="{Binding Analytics.PageValue}"/>
+                                                <DataGridTextColumn Header="タイトル文字数チェック" Binding="{Binding WordPress.LengthCheck, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="タイトルキーワードチェック" Binding="{Binding WordPress.KeywordCheck, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="URL" Binding="{Binding WordPress.Link}"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Column="1" Header="記事内容">
-                                    <TextBox Margin="5" AcceptsReturn="True"
-                                         VerticalScrollBarVisibility="Auto"
-                                         Text="{Binding CombineData.CombineDataList.SelectedItem.WordPress.Contents}"/>
-                                </GroupBox>
+                                <TabControl Grid.Column="1">
+                                    <TabItem Header="Article">
+                                        <GroupBox Header="記事内容">
+                                            <TextBox Margin="5" AcceptsReturn="True" FontSize="20"
+                                                 VerticalScrollBarVisibility="Auto" IsReadOnly="True"
+                                                 Text="{Binding CombineData.CombineDataList.SelectedItem.WordPress.ContentsEx, Mode=OneWay}" Cursor="IBeam"/>
+                                        </GroupBox>
+                                    </TabItem>
+                                    <TabItem Header="Setting">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="272*"/>
+                                                <ColumnDefinition Width="311*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <DataGrid Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding Config.KeywordList.Items}">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Keyword" Binding="{Binding Keyword}"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                            <StackPanel Grid.Column="1">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock VerticalAlignment="Center" Margin="5" Text="タイトル長"/>
+                                                    <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMin}"/>
+                                                    <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMax}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+
 
                                 <StackPanel Orientation="Horizontal" Margin="5" Grid.Row="1">
                                     <Button Margin="5" Width="100" Content="結合">
@@ -156,7 +208,9 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
                                     <DataGridTextColumn Header="タイトル" Binding="{Binding Title}"/>
-                                    <DataGridTextColumn Header="文字数" Binding="{Binding ContentLength}"/>
+                                    <DataGridTextColumn Header="タイトル文字数チェック" Binding="{Binding LengthCheck}"/>
+                                    <DataGridTextColumn Header="タイトルキーワードチェック" Binding="{Binding KeywordCheck}"/>
+                                    <DataGridTextColumn Header="記事文字数" Binding="{Binding ContentLength}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -174,26 +228,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem Header="Setting">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="272*"/>
-                                    <ColumnDefinition Width="311*"/>
-                                </Grid.ColumnDefinitions>
-                                <DataGrid Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding Config.KeywordList.Items}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Keyword" Binding="{Binding Keyword}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Grid.Column="1">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock VerticalAlignment="Center" Margin="5" Text="タイトル長"/>
-                                        <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMin}"/>
-                                        <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMax}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </TabItem>
+                        
                     </TabControl>
                 </Grid>
             </GroupBox>
