@@ -103,10 +103,17 @@
                                     <DataGrid IsReadOnly="True" AutoGenerateColumns="False"
                                       ItemsSource="{Binding CombineData.CombineDataList.Items}"
                                       SelectedItem="{Binding CombineData.CombineDataList.SelectedItem}" Margin="5">
+                                        <b:Interaction.Triggers>
+                                            <b:EventTrigger EventName="MouseDoubleClick">
+                                                <b:CallMethodAction MethodName="RowDoubleClick" TargetObject="{Binding}"/>
+                                            </b:EventTrigger>
+                                        </b:Interaction.Triggers>
+
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="ID" Binding="{Binding WordPress.Id}"/>
                                             <DataGridTextColumn Header="タイトル" Binding="{Binding WordPress.Title}"/>
                                             <DataGridTextColumn Header="文字数" Binding="{Binding WordPress.ContentLength, Mode=OneWay}"/>
+                                            <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding WordPress.ContentLength2, Mode=OneWay}"/>
                                             <DataGridTextColumn Header="ページビュー" Binding="{Binding Analytics.PageView}"/>
                                             <DataGridTextColumn Header="平均滞在時間" Binding="{Binding Analytics.StayTime}"/>
                                             <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Analytics.PageViewStart}"/>
@@ -134,7 +141,7 @@
                                     <Button Margin="5" Width="100" Content="出力" Cursor="Hand">
                                         <b:Interaction.Triggers>
                                             <b:EventTrigger EventName="Click">
-                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="Combine"/>
+                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcel"/>
                                             </b:EventTrigger>
                                         </b:Interaction.Triggers>
                                     </Button>
@@ -166,6 +173,26 @@
                                     <DataGridTextColumn Header="ページの価値" Binding="{Binding PageValue}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Setting">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="272*"/>
+                                    <ColumnDefinition Width="311*"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding Config.KeywordList.Items}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Keyword" Binding="{Binding Keyword}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel Grid.Column="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center" Margin="5" Text="タイトル長"/>
+                                        <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMin}"/>
+                                        <TextBox Margin="5" Width="100" Text="{Binding Config.TitleLengthMax}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </Grid>

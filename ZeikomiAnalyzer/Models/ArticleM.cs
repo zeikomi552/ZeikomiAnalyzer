@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WordPressPCL.Models;
 
@@ -81,6 +82,7 @@ namespace ZeikomiAnalyzer.Models
 					_Contents = value;
 					NotifyPropertyChanged("Contents");
 					NotifyPropertyChanged("ContentLength");
+					NotifyPropertyChanged("ContentLength2");
 				}
 			}
 		}
@@ -118,5 +120,15 @@ namespace ZeikomiAnalyzer.Models
 				return this.Contents.Length;
 			}
         }
-	}
+
+		public int ContentLength2
+        {
+			get
+			{
+				var text = Regex.Replace(this.Contents, "<[^>]*?>", "");
+				return text.Length;
+			}
+        }
+
+    }
 }

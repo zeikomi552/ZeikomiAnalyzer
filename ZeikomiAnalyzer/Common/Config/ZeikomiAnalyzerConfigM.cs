@@ -2,10 +2,12 @@
 using MVVMCore.Common.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZeikomiAnalyzer.Models;
 
 namespace ZeikomiAnalyzer.Common.Config
 {
@@ -86,6 +88,87 @@ namespace ZeikomiAnalyzer.Common.Config
 		}
 		#endregion
 
+		#region タイトルの長さ最小値[TitleLengthMin]プロパティ
+		/// <summary>
+		/// タイトルの長さ最小値[TitleLengthMin]プロパティ用変数
+		/// </summary>
+		int _TitleLengthMin = 30;
+		/// <summary>
+		/// タイトルの長さ最小値[TitleLengthMin]プロパティ
+		/// </summary>
+		public int TitleLengthMin
+		{
+			get
+			{
+				return _TitleLengthMin;
+			}
+			set
+			{
+				if (!_TitleLengthMin.Equals(value))
+				{
+					_TitleLengthMin = value;
+					NotifyPropertyChanged("TitleLengthMin");
+				}
+			}
+		}
+		#endregion
+
+		#region タイトルの長さ最大値[TitleLengthMax]プロパティ
+		/// <summary>
+		/// タイトルの長さ最大値[TitleLengthMax]プロパティ用変数
+		/// </summary>
+		int _TitleLengthMax = 40;
+		/// <summary>
+		/// タイトルの長さ最大値[TitleLengthMax]プロパティ
+		/// </summary>
+		public int TitleLengthMax
+		{
+			get
+			{
+				return _TitleLengthMax;
+			}
+			set
+			{
+				if (!_TitleLengthMax.Equals(value))
+				{
+					_TitleLengthMax = value;
+					NotifyPropertyChanged("TitleLengthMax");
+				}
+			}
+		}
+		#endregion
+
+		#region キーワードリスト[KeywordList]プロパティ
+		/// <summary>
+		/// キーワードリスト[KeywordList]プロパティ用変数
+		/// </summary>
+		ModelList<TitleKeywordM> _KeywordList = new ModelList<TitleKeywordM>();
+		/// <summary>
+		/// キーワードリスト[KeywordList]プロパティ
+		/// </summary>
+		public ModelList<TitleKeywordM> KeywordList
+		{
+			get
+			{
+				return _KeywordList;
+			}
+			set
+			{
+				if (_KeywordList == null || !_KeywordList.Equals(value))
+				{
+					_KeywordList = value;
+					NotifyPropertyChanged("KeywordList");
+				}
+			}
+		}
+		#endregion
+
+
+
+
+
+
+
 		#region コンフィグの保存処理
 		/// <summary>
 		/// コンフィグの保存処理
@@ -118,6 +201,9 @@ namespace ZeikomiAnalyzer.Common.Config
 					this.UserAccount = conf.UserAccount;
 					this.Password = conf.Password;
 					this.Url = conf.Url;
+					this.KeywordList = conf.KeywordList;
+					this.TitleLengthMin = conf.TitleLengthMin;
+					this.TitleLengthMax = conf.TitleLengthMax;
 				}
 			}
 			catch (Exception e)

@@ -4,6 +4,7 @@ using MVVMCore.BaseClass;
 using MVVMCore.Common.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -204,17 +205,18 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
+                var tmp = new ArticleCollectionM();
                 this.IsExecute = true;
-                // 一旦削除
-                this.Articles.Clear();
 
                 //// 記事一覧の取得
                 var posts = await WordpressAPI.WpClient.Posts.GetAll();
-                this.Articles.Add(new List<Post>(posts));
+                tmp.Add(new List<Post>(posts));
 
                 //// 固定ページ一覧の取得
                 var pages = await WordpressAPI.WpClient.Pages.GetAll();
-                this.Articles.Add(new List<Page>(pages));
+                tmp.Add(new List<Page>(pages));
+
+                this.Articles = tmp;
                 this.IsExecute = false;
             }
             catch (Exception e)
@@ -372,8 +374,9 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
+                CombineDataCollectionM cmb = new CombineDataCollectionM();
                 // データのクリア
-                this.CombineData.Clear();
+                //this.CombineData.Clear();
 
                 // 記事数分回す
                 foreach (var article in this.Articles.Articles.Items)
@@ -390,16 +393,21 @@ namespace ZeikomiAnalyzer.ViewModels
                     if (tmp != null)
                     {
                         // ワードプレス記事とアナリティクスデータを結合して登録
-                        this.CombineData.Add(article, tmp);
+                        cmb.Add(article, tmp);
                     }
                     // 一致しない場合
                     else
                     {
                         // ワードプレス記事を登録する
                         // アナリティクスデータはないので全て0で登録
-                        this.CombineData.Add(article, new GoogleAnalyticsM());
+                        cmb.Add(article, new GoogleAnalyticsM());
                     }
                 }
+
+                this.CombineData.CombineDataList.Items 
+                    = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
+                                                                                                                                orderby x.Analytics.PageView, x.WordPress.Id
+                                                                                                                                select x).ToList());
             }
             catch (Exception e)
             {
@@ -438,5 +446,81 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
         #endregion
+
+
+        public void RowDoubleClick()
+        {
+            try
+            {
+                ProcessStartInfo pi = new ProcessStartInfo()
+                {
+                    FileName = this.CombineData.CombineDataList.SelectedItem.WordPress.Link,
+                    UseShellExecute = true,
+                };
+
+                Process.Start(pi);
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+        public void SaveExcel()
+        {
+            try
+            {
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "Excelファイル (*.xlsx)|*.xlsx";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    XLWorkbook book = new XLWorkbook();
+                    book.Worksheets.Add("出力");
+                    int row = 1, col = 1;
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ID";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数(タグ除外)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページビュー数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページ別訪問数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "平均滞在時間";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "閲覧開始数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "直帰率";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "離脱率";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページの価値";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL";
+
+                    foreach (var tmp in this.CombineData.CombineDataList.Items)
+                    {
+                        col = 1;
+                        row++;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Id;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Title;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength2;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageView;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.UniquePageView;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.StayTime;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageViewStart;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.ReturnRatio;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.LeaveRatio;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageValue;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Link;
+                    }
+
+                    book.SaveAs(dialog.FileName);
+
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
     }
 }
