@@ -163,7 +163,55 @@ namespace ZeikomiAnalyzer.Common.Config
 		}
 		#endregion
 
+		#region GoogleアナリティクスAPI用秘密鍵ファイルパス[GoogleAnalyticsPrivateKey]プロパティ
+		/// <summary>
+		/// GoogleアナリティクスAPI用秘密鍵ファイルパス[GoogleAnalyticsPrivateKey]プロパティ用変数
+		/// </summary>
+		string _GoogleAnalyticsPrivateKey = string.Empty;
+		/// <summary>
+		/// GoogleアナリティクスAPI用秘密鍵ファイルパス[GoogleAnalyticsPrivateKey]プロパティ
+		/// </summary>
+		public string GoogleAnalyticsPrivateKey
+		{
+			get
+			{
+				return _GoogleAnalyticsPrivateKey;
+			}
+			set
+			{
+				if (_GoogleAnalyticsPrivateKey == null || !_GoogleAnalyticsPrivateKey.Equals(value))
+				{
+					_GoogleAnalyticsPrivateKey = value;
+					NotifyPropertyChanged("GoogleAnalyticsPrivateKey");
+				}
+			}
+		}
+		#endregion
 
+		#region GoogleAnalyticsViewId[ViewId]プロパティ
+		/// <summary>
+		/// GoogleAnalyticsViewId[ViewId]プロパティ用変数
+		/// </summary>
+		string _ViewId = string.Empty;
+		/// <summary>
+		/// GoogleAnalyticsViewId[ViewId]プロパティ
+		/// </summary>
+		public string ViewId
+		{
+			get
+			{
+				return _ViewId;
+			}
+			set
+			{
+				if (_ViewId == null || !_ViewId.Equals(value))
+				{
+					_ViewId = value;
+					NotifyPropertyChanged("ViewId");
+				}
+			}
+		}
+		#endregion
 
 
 
@@ -177,7 +225,7 @@ namespace ZeikomiAnalyzer.Common.Config
 		{
 			try
 			{
-				XMLUtil.Seialize<ZeikomiAnalyzerConfigM>(ConfigManager.KeysFile, this);
+				XMLUtil.Seialize<ZeikomiAnalyzerConfigM>(ConfigManager.ConfigFilePath, this);
 			}
 			catch (Exception e)
 			{
@@ -194,9 +242,9 @@ namespace ZeikomiAnalyzer.Common.Config
         {
 			try
 			{
-				if (File.Exists(ConfigManager.KeysFile))
+				if (File.Exists(ConfigManager.ConfigFilePath))
 				{
-					var conf = XMLUtil.Deserialize<ZeikomiAnalyzerConfigM>(ConfigManager.KeysFile);
+					var conf = XMLUtil.Deserialize<ZeikomiAnalyzerConfigM>(ConfigManager.ConfigFilePath);
 
 					this.UserAccount = conf.UserAccount;
 					this.Password = conf.Password;
@@ -204,6 +252,8 @@ namespace ZeikomiAnalyzer.Common.Config
 					this.KeywordList = conf.KeywordList;
 					this.TitleLengthMin = conf.TitleLengthMin;
 					this.TitleLengthMax = conf.TitleLengthMax;
+					this.GoogleAnalyticsPrivateKey = conf.GoogleAnalyticsPrivateKey;
+					this.ViewId = conf.ViewId;
 				}
 			}
 			catch (Exception e)

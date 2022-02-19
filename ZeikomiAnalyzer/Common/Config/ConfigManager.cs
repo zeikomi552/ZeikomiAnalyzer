@@ -30,7 +30,7 @@ namespace ZeikomiAnalyzer.Common.Config
         /// <summary>
         /// キーファイルパス
         /// </summary>
-        public static string KeysFile { get; set; } = Path.Combine(ConfigManager.ConfigDir, "ZeikomiAnalyzer.keys");
+        public static string ConfigFilePath { get; set; } = Path.Combine(ConfigManager.ConfigDir, "ZeikomiAnalyzer.conf");
         #endregion
 
     }

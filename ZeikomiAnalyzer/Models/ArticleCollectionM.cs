@@ -46,6 +46,7 @@ namespace ZeikomiAnalyzer.Models
 					Link = post.Link,
 					Title = post.Title.Rendered,
 					Contents = post.Content.Rendered
+					
 				}
 				);
 			}

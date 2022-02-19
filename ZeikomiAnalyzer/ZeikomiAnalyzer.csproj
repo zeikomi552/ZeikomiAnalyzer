@@ -13,6 +13,9 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="Google.Apis" Version="1.56.0" />
+    <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.56.0.2484" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.56.0" />
     <PackageReference Include="log4net" Version="2.0.14" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.2.0" />

@@ -15,6 +15,9 @@ using WordPressPCL.Models;
 using ZeikomiAnalyzer.Common;
 using ZeikomiAnalyzer.Common.Config;
 using ZeikomiAnalyzer.Models;
+using Google.Apis.AnalyticsReporting.v4;
+using Google.Apis.AnalyticsReporting.v4.Data;
+using Google.Apis.Auth.OAuth2;
 
 namespace ZeikomiAnalyzer.ViewModels
 {
@@ -172,6 +175,33 @@ namespace ZeikomiAnalyzer.ViewModels
         #endregion
 
 
+        #region GoogleAnalytics検索条件[AnalyticsSearchCondition]プロパティ
+        /// <summary>
+        /// GoogleAnalytics検索条件[AnalyticsSearchCondition]プロパティ用変数
+        /// </summary>
+        GoogleAnalyticsSearchM _AnalyticsSearchCondition = new GoogleAnalyticsSearchM();
+        /// <summary>
+        /// GoogleAnalytics検索条件[AnalyticsSearchCondition]プロパティ
+        /// </summary>
+        public GoogleAnalyticsSearchM AnalyticsSearchCondition
+        {
+            get
+            {
+                return _AnalyticsSearchCondition;
+            }
+            set
+            {
+                if (_AnalyticsSearchCondition == null || !_AnalyticsSearchCondition.Equals(value))
+                {
+                    _AnalyticsSearchCondition = value;
+                    NotifyPropertyChanged("AnalyticsSearchCondition");
+                }
+            }
+        }
+        #endregion
+
+
+
 
         #region 初期化処理
         /// <summary>
@@ -193,6 +223,8 @@ namespace ZeikomiAnalyzer.ViewModels
                     // 接続用Clientの作成
                     await this.WordpressAPI.CreateClient(this.Config.Url, this.Config.UserAccount, this.Config.Password);
                 }
+
+                this.AnalyticsSearchCondition.ViewId = this.Config.ViewId;
             }
             catch (Exception e)
             {
@@ -566,6 +598,40 @@ namespace ZeikomiAnalyzer.ViewModels
                 {
                     this.ETitle.Title = this.CombineData.CombineDataList.SelectedItem.WordPress.Title;
                 }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+
+        /// <summary>
+        /// 秘密鍵のファイルパスを開く
+        /// </summary>
+        public void OpenPrivateKey()
+        {
+            // ダイアログのインスタンスを生成
+            var dialog = new OpenFileDialog();
+
+            // ファイルの種類を設定
+            dialog.Filter = "JSONファイル (*.json)|*.json";
+
+            // ダイアログを表示する
+            if (dialog.ShowDialog() == true)
+            {
+                this.Config.GoogleAnalyticsPrivateKey = dialog.FileName;
+            }
+        }
+
+        /// <summary>
+        /// GoogleAnalyticsの結果取得
+        /// </summary>
+        public void GetAnalytics()
+        {
+            try
+            {
+                var result = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
             }
             catch (Exception e)
             {
