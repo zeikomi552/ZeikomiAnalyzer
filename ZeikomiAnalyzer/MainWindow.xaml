@@ -313,14 +313,34 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.ZeroTitles.Items}"
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="129*"/>
+                                        <RowDefinition Height="14*"/>
+                                    </Grid.RowDefinitions>
+                                    <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.ZeroTitles.Items}"
                                           SelectedItem="{Binding Articles.ZeroTitles.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="ページ" Binding="{Binding Link}"/>
-                                        <DataGridTextColumn Header="ページタイトル" Binding="{Binding Title}"/>
-                                        <DataGridTextColumn Header="タイプ" Binding="{Binding Type}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="ページ" Binding="{Binding Link}"/>
+                                            <DataGridTextColumn Header="ページタイトル" Binding="{Binding Title}"/>
+                                            <DataGridTextColumn Header="タイプ" Binding="{Binding Type}"/>
+                                            <DataGridTextColumn Header="カテゴリ" Binding="{Binding CategoriesText}"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                        <Button Content="Excel出力">
+                                            <b:Interaction.Triggers>
+                                                <b:EventTrigger EventName="Click">
+                                                    <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelZeroArticle"/>
+                                                </b:EventTrigger>
+                                            </b:Interaction.Triggers>
+                                        </Button>
+                                        <CheckBox Margin="5" Content="固定ページ"/>
+                                        <CheckBox Margin="5" Content="投稿ページ"/>
+                                        <TextBlock Margin="5" VerticalAlignment="Center" Text="カテゴリ(Idで指定):"/>
+                                        <TextBox Margin="5" VerticalAlignment="Center" Width="100" Text=""/>
+                                    </StackPanel>
+                                </Grid>
                                 <TextBox Margin="5" Background="WhiteSmoke" Grid.Column="1" 
                                          IsReadOnly="False" AcceptsReturn="True" Text="{Binding Articles.ZeroTitles.SelectedItem.Contents}" Cursor="IBeam"/>
                             </Grid>

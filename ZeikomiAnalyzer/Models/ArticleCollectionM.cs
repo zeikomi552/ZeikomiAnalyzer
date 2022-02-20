@@ -61,6 +61,7 @@ namespace ZeikomiAnalyzer.Models
 			}
 		}
 		#endregion
+
 		#region GoogleAnalyticsの結果[Analytics]プロパティ
 		/// <summary>
 		/// GoogleAnalyticsの結果[Analytics]プロパティ用変数
@@ -111,6 +112,11 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region アナリティクスデータの追加処理
+		/// <summary>
+		/// アナリティクスデータの追加処理
+		/// </summary>
+		/// <param name="report_rows">行データ</param>
 		public void Add(IEnumerable<ReportRow> report_rows)
 		{
 			foreach (var row in report_rows)
@@ -122,6 +128,7 @@ namespace ZeikomiAnalyzer.Models
 			}
 
 		}
+		#endregion
 
 		#region 投稿記事の追加
 		/// <summary>
@@ -151,7 +158,16 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
-		public void AddNeet(string url, string title, string content, string type)
+		#region アクセス数ゼロの記事の追加処理
+		/// <summary>
+		/// アクセス数ゼロの記事の追加処理
+		/// </summary>
+		/// <param name="url">URL</param>
+		/// <param name="title">タイトル</param>
+		/// <param name="content">コンテンツ</param>
+		/// <param name="type">タイプ post or page</param>
+		/// <param name="categories">カテゴリ</param>
+		public void AddNeet(string url, string title, string content, string type, int[] categories = null)
 		{
 			this.ZeroTitles.Items.Add(
 				new ArticleM()
@@ -159,11 +175,17 @@ namespace ZeikomiAnalyzer.Models
 					Title = title,
 					Contents = content,
 					Link = url,
-					Type = type
+					Type = type,
+					Categories = categories
 				}
 				);
 		}
+		#endregion
 
+		#region クリア処理
+		/// <summary>
+		/// クリア処理
+		/// </summary>
 		public void Clear()
         {
 			this.Posts.Items.Clear();
@@ -171,5 +193,6 @@ namespace ZeikomiAnalyzer.Models
 			this.Analytics.Items.Clear();
 			this.ZeroTitles.Items.Clear();
 		}
-	}
+        #endregion
+    }
 }

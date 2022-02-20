@@ -149,6 +149,61 @@ namespace ZeikomiAnalyzer.Models
 			}
 		}
 		#endregion
+		#region カテゴリ[Categories]プロパティ
+		/// <summary>
+		/// カテゴリ[Categories]プロパティ用変数
+		/// </summary>
+		int[] _Categories = null;
+		/// <summary>
+		/// カテゴリ[Categories]プロパティ
+		/// </summary>
+		public int[] Categories
+		{
+			get
+			{
+				return _Categories;
+			}
+			set
+			{
+				if (_Categories == null || !_Categories.Equals(value))
+				{
+					_Categories = value;
+					NotifyPropertyChanged("Categories");
+					NotifyPropertyChanged("CategoriesText");
+				}
+			}
+		}
+		#endregion
+
+		public string CategoriesText
+        {
+            get
+            {
+				string cate = string.Empty;
+
+				if (Categories != null)
+				{
+					foreach (var category in Categories)
+					{
+						if (string.IsNullOrEmpty(cate))
+						{
+							cate += category.ToString();
+						}
+						else
+						{
+							cate += "," + category.ToString();
+						}
+					}
+					return cate;
+				}
+				else
+				{
+					return string.Empty;
+				}
+
+			}
+		}
+
 
 
 		#region 記事の長さ

@@ -399,7 +399,7 @@ namespace ZeikomiAnalyzer.ViewModels
                         continue;
                     }
 
-                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;","―"), article.Content.Rendered, "post");
+                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;","―"), article.Content.Rendered, "post", article.Categories);
                 }
             }
             catch (Exception e)
@@ -657,6 +657,43 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.LengthCheck;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.KeywordCheck;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Link;
+                    }
+
+                    book.SaveAs(dialog.FileName);
+
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+        public void SaveExcelZeroArticle()
+        {
+            try
+            {
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "Excelファイル (*.xlsx)|*.xlsx";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    XLWorkbook book = new XLWorkbook();
+                    book.Worksheets.Add("出力");
+                    int row = 1, col = 1;
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "メッセージ(全角140文字 半角280文字まで)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL(23文字+改行1文字扱い)";
+
+                    foreach (var tmp in this.Articles.ZeroTitles.Items)
+                    {
+                        col = 1;
+                        row++;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = "#プログラマーやめました #ランダム送信\r\n" + tmp.Title;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Link;
                     }
 
                     book.SaveAs(dialog.FileName);
