@@ -129,6 +129,13 @@
                                 </b:EventTrigger>
                             </b:Interaction.Triggers>
                         </Button>
+                        <Button Margin="5" Width="auto" Content="ニート抽出" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}" Cursor="Hand">
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="Click">
+                                    <b:CallMethodAction TargetObject="{Binding}" MethodName="OutputZeroAccess"/>
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </Button>
                     </StackPanel>
 
                 </Grid>
@@ -250,34 +257,76 @@
 
                             </Grid>
                         </TabItem>
-                        <TabItem Header="WordPress">
-                            <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.Articles.Items}"
-                                  SelectedItem="{Binding Articles.Articles.SelectedItem}"
-                                  Margin="5">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
-                                    <DataGridTextColumn Header="タイトル" Binding="{Binding Title}"/>
-                                    <DataGridTextColumn Header="タイトル文字数チェック" Binding="{Binding LengthCheck}"/>
-                                    <DataGridTextColumn Header="タイトルキーワードチェック" Binding="{Binding KeywordCheck}"/>
-                                    <DataGridTextColumn Header="記事文字数" Binding="{Binding ContentLength}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                        <TabItem Header="固定ページ">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.Pages.Items}"
+                                  SelectedItem="{Binding Articles.Pages.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="タイトル" Binding="{Binding Title.Rendered}"/>
+                                        <DataGridTextColumn Header="ページ" Binding="{Binding Link}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <TextBox Margin="5" Background="WhiteSmoke" Grid.Column="1"
+                                         IsReadOnly="False" AcceptsReturn="True" Text="{Binding Articles.Pages.SelectedItem.Content.Rendered}" Cursor="IBeam"/>
+                            </Grid>
                         </TabItem>
-                        <TabItem Header="Google Analytics">
-                            <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding AnalyticsList.GoogleAnalyticsItems.Items}">
+                        <TabItem Header="投稿ページ">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.Posts.Items}"
+                                  SelectedItem="{Binding Articles.Posts.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="タイトル" Binding="{Binding Title.Rendered}"/>
+                                        <DataGridTextColumn Header="ページ" Binding="{Binding Link}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <TextBox Margin="5" Background="WhiteSmoke" Grid.Column="1" 
+                                         IsReadOnly="False" AcceptsReturn="True" Text="{Binding Articles.Posts.SelectedItem.Content.Rendered}" Cursor="IBeam"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="アナリティクス">
+                            <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.Analytics.Items}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="ページ" Binding="{Binding Page}"/>
-                                    <DataGridTextColumn Header="ページビュー数" Binding="{Binding PageView}"/>
-                                    <DataGridTextColumn Header="ページ別訪問数" Binding="{Binding UniquePageView}"/>
-                                    <DataGridTextColumn Header="平均ページ滞在時間" Binding="{Binding StayTime}"/>
-                                    <DataGridTextColumn Header="閲覧開始数" Binding="{Binding PageViewStart}"/>
-                                    <DataGridTextColumn Header="直帰率" Binding="{Binding ReturnRatio}"/>
-                                    <DataGridTextColumn Header="離脱率" Binding="{Binding LeaveRatio}"/>
-                                    <DataGridTextColumn Header="ページの価値" Binding="{Binding PageValue}"/>
+                                    <DataGridTextColumn Header="ページタイトル" Binding="{Binding PageTitle}"/>
+                                    <DataGridTextColumn Header="ページビュー数" Binding="{Binding PageViews}"/>
+                                    <DataGridTextColumn Header="ページ別訪問数" Binding="{Binding PageViewsPerSession}"/>
+                                    <DataGridTextColumn Header="平均ページ滞在時間" Binding="{Binding AvgTimeOnPage}"/>
+                                    <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Entrances}"/>
+                                    <DataGridTextColumn Header="離脱率" Binding="{Binding ExitRate}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        
+                        <TabItem Header="ニート記事">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.ZeroTitles.Items}"
+                                          SelectedItem="{Binding Articles.ZeroTitles.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ページ" Binding="{Binding Link}"/>
+                                        <DataGridTextColumn Header="ページタイトル" Binding="{Binding Title}"/>
+                                        <DataGridTextColumn Header="タイプ" Binding="{Binding Type}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <TextBox Margin="5" Background="WhiteSmoke" Grid.Column="1" 
+                                         IsReadOnly="False" AcceptsReturn="True" Text="{Binding Articles.ZeroTitles.SelectedItem.Contents}" Cursor="IBeam"/>
+                            </Grid>
+
+                        </TabItem>
+
                     </TabControl>
                 </Grid>
             </GroupBox>

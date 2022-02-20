@@ -117,7 +117,6 @@ namespace ZeikomiAnalyzer.Models
 				// ディメンションのセット
 				// 参考：https://ga-dev-tools.web.app/dimensions-metrics-explorer/
 				report_request.Dimensions = new[] {
-					new Dimension { Name = "ga:hostname" },
 					new Dimension { Name = "ga:pagePath" },
 					new Dimension { Name = "ga:pageTitle" }
 				};
@@ -143,13 +142,13 @@ namespace ZeikomiAnalyzer.Models
 						EndDate = this.SearchEnd.ToString("yyyy-MM-dd") }
 				};
 
-				// ソート順 日付で昇順
-				report_request.OrderBys = new[] {
-					new OrderBy {
-						FieldName = "ga:date",
-						SortOrder = "DESCENDING"
-					}
-				};
+				//// ソート順 日付で昇順
+				//report_request.OrderBys = new[] {
+				//	new OrderBy {
+				//		FieldName = "ga:date",
+				//		SortOrder = "DESCENDING"
+				//	}
+				//};
 
 				request.ReportRequests = new[] { report_request };
 				ReportsResource.BatchGetRequest batchRequest = service.Reports.BatchGet(request);

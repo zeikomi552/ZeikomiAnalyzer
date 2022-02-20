@@ -125,6 +125,32 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region 記事の種別 post or page[Type]プロパティ
+		/// <summary>
+		/// 記事の種別 post or page[Type]プロパティ用変数
+		/// </summary>
+		string _Type = string.Empty;
+		/// <summary>
+		/// 記事の種別 post or page[Type]プロパティ
+		/// </summary>
+		public string Type
+		{
+			get
+			{
+				return _Type;
+			}
+			set
+			{
+				if (_Type == null || !_Type.Equals(value))
+				{
+					_Type = value;
+					NotifyPropertyChanged("Type");
+				}
+			}
+		}
+		#endregion
+
+
 		#region 記事の長さ
 		/// <summary>
 		/// 記事の長さ

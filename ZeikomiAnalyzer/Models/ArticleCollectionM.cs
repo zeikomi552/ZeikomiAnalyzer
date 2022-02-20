@@ -1,4 +1,5 @@
-﻿using MVVMCore.BaseClass;
+﻿using Google.Apis.AnalyticsReporting.v4.Data;
+using MVVMCore.BaseClass;
 using MVVMCore.Common.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,64 +12,164 @@ namespace ZeikomiAnalyzer.Models
 {
     public class ArticleCollectionM : ModelBase
     {
-		#region 記事リスト[Articles]プロパティ
+		#region 投稿ページ[Pages]プロパティ
 		/// <summary>
-		/// 記事リスト[Articles]プロパティ用変数
+		/// 投稿ページ[Pages]プロパティ用変数
 		/// </summary>
-		ModelList<ArticleM> _Articles = new ModelList<ArticleM>();
+		ModelList<Page> _Pages = new ModelList<Page>();
 		/// <summary>
-		/// 記事リスト[Articles]プロパティ
+		/// 投稿ページ[Pages]プロパティ
 		/// </summary>
-		public ModelList<ArticleM> Articles
+		public ModelList<Page> Pages
 		{
 			get
 			{
-				return _Articles;
+				return _Pages;
 			}
 			set
 			{
-				if (_Articles == null || !_Articles.Equals(value))
+				if (_Pages == null || !_Pages.Equals(value))
 				{
-					_Articles = value;
-					NotifyPropertyChanged("Articles");
+					_Pages = value;
+					NotifyPropertyChanged("Pages");
 				}
 			}
 		}
 		#endregion
 
+		#region 固定ページ[Posts]プロパティ
+		/// <summary>
+		/// 固定ページ[Posts]プロパティ用変数
+		/// </summary>
+		ModelList<Post> _Posts = new ModelList<Post>();
+		/// <summary>
+		/// 固定ページ[Posts]プロパティ
+		/// </summary>
+		public ModelList<Post> Posts
+		{
+			get
+			{
+				return _Posts;
+			}
+			set
+			{
+				if (_Posts == null || !_Posts.Equals(value))
+				{
+					_Posts = value;
+					NotifyPropertyChanged("Posts");
+				}
+			}
+		}
+		#endregion
+		#region GoogleAnalyticsの結果[Analytics]プロパティ
+		/// <summary>
+		/// GoogleAnalyticsの結果[Analytics]プロパティ用変数
+		/// </summary>
+		ModelList<GoogleAnalyticsM> _Analytics = new ModelList<GoogleAnalyticsM>();
+		/// <summary>
+		/// GoogleAnalyticsの結果[Analytics]プロパティ
+		/// </summary>
+		public ModelList<GoogleAnalyticsM> Analytics
+		{
+			get
+			{
+				return _Analytics;
+			}
+			set
+			{
+				if (_Analytics == null || !_Analytics.Equals(value))
+				{
+					_Analytics = value;
+					NotifyPropertyChanged("Analytics");
+				}
+			}
+		}
+		#endregion
+
+		#region ニート記事リスト[ZeroTitles]プロパティ
+		/// <summary>
+		/// ニート記事リスト[ZeroTitles]プロパティ用変数
+		/// </summary>
+		ModelList<ArticleM> _ZeroTitles = new ModelList<ArticleM>();
+		/// <summary>
+		/// ニート記事リスト[ZeroTitles]プロパティ
+		/// </summary>
+		public ModelList<ArticleM> ZeroTitles
+		{
+			get
+			{
+				return _ZeroTitles;
+			}
+			set
+			{
+				if (_ZeroTitles == null || !_ZeroTitles.Equals(value))
+				{
+					_ZeroTitles = value;
+					NotifyPropertyChanged("ZeroTitles");
+				}
+			}
+		}
+		#endregion
+
+		public void Add(IEnumerable<ReportRow> report_rows)
+		{
+			foreach (var row in report_rows)
+			{
+				var tmp = new GoogleAnalyticsM();
+				tmp.SetValue(row);
+
+				this.Analytics.Items.Add(tmp);
+			}
+
+		}
+
+		#region 投稿記事の追加
+		/// <summary>
+		/// 投稿記事の追加
+		/// </summary>
+		/// <param name="posts">投稿記事リスト</param>
 		public void Add(IEnumerable<Post> posts)
 		{
 			foreach (var post in posts)
 			{
-				this.Articles.Items.Add(new ArticleM()
-				{
-					Id = post.Id,
-					Link = post.Link,
-					Title = post.Title.Rendered,
-					Contents = post.Content.Rendered
-					
-				}
-				);
+				this.Posts.Items.Add(post);
 			}
 		}
+		#endregion
+
+		#region 固定ページの追加
+		/// <summary>
+		/// 固定ページの追加
+		/// </summary>
+		/// <param name="pages">固定ページリスト</param>
 		public void Add(IEnumerable<Page> pages)
 		{
 			foreach (var page in pages)
 			{
-				this.Articles.Items.Add(new ArticleM()
+				this.Pages.Items.Add(page);
+			}
+		}
+		#endregion
+
+		public void AddNeet(string url, string title, string content, string type)
+		{
+			this.ZeroTitles.Items.Add(
+				new ArticleM()
 				{
-					Id = page.Id,
-					Link = page.Link,
-					Title = page.Title.Rendered,
-					Contents = page.Content.Rendered
+					Title = title,
+					Contents = content,
+					Link = url,
+					Type = type
 				}
 				);
-			}
 		}
 
 		public void Clear()
         {
-			this.Articles.Items.Clear();
-        }
+			this.Posts.Items.Clear();
+			this.Pages.Items.Clear();
+			this.Analytics.Items.Clear();
+			this.ZeroTitles.Items.Clear();
+		}
 	}
 }

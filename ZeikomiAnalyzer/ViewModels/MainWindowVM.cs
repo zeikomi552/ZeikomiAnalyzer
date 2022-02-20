@@ -263,6 +263,9 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
+                this.Articles.Pages.Items.Clear();
+                this.Articles.Posts.Items.Clear();
+
                 var tmp = new ArticleCollectionM();
                 this.IsExecute = true;
 
@@ -301,6 +304,34 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region GoogleAnalyticsの結果取得
+        /// <summary>
+        /// GoogleAnalyticsの結果取得
+        /// </summary>
+        public void GetAnalytics()
+        {
+            try
+            {
+                // 記事の削除
+                this.Articles.Analytics.Items.Clear();
+
+                var results = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
+
+                foreach(var result in results)
+                {
+                    var report = result.Reports.First();
+
+                    this.Articles.Add(report.Data.Rows);
+                }
+
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+        #endregion
+
         #region GoogleAnalyticsの結果を開く
         /// <summary>
         /// GoogleAnalyticsの結果を開く
@@ -321,6 +352,54 @@ namespace ZeikomiAnalyzer.ViewModels
                     this.IsExecute = true;
                     GetAnalytics(dialog.FileName, "データセット1");
                     this.IsExecute = false;
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+        #endregion
+
+        #region ニート記事の抽出
+        /// <summary>
+        /// ニート記事の抽出
+        /// </summary>
+        public void OutputZeroAccess()
+        {
+            try
+            {
+                // ニート記事一覧の初期化
+                this.Articles.ZeroTitles.Items.Clear();
+
+                foreach (var article in this.Articles.Pages.Items)
+                {
+                    string slug = "/" + article.Slug + "/";
+
+                    // 一部一致のものを探す //amp=等の対策
+                    if ((from x in this.Articles.Analytics.Items
+                         where x.Page.Contains(slug)
+                         select x).Any())
+                    {
+                        continue;
+                    }
+
+                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "page");
+                }
+
+                foreach (var article in this.Articles.Posts.Items)
+                {
+                    string slug = "/" + article.Slug + "/";
+
+                    // 一部一致のものを探す //amp=等の対策
+                    if ((from x in this.Articles.Analytics.Items
+                         where x.Page.Contains(slug)
+                         select x).Any())
+                    {
+                        continue;
+                    }
+
+                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;","―"), article.Content.Rendered, "post");
                 }
             }
             catch (Exception e)
@@ -436,36 +515,36 @@ namespace ZeikomiAnalyzer.ViewModels
                 // データのクリア
                 //this.CombineData.Clear();
 
-                // 記事数分回す
-                foreach (var article in this.Articles.Articles.Items)
-                {
-                    string link = article.Link;                 // リンク情報の取得
-                    string url = AdjustURL(this.Config.Url);    // 末尾の/を取り除くいてURLを調整する
+            //    // 記事数分回す
+            //    foreach (var article in this.Articles.Articles.Items)
+            //    {
+            //        string link = article.Link;                 // リンク情報の取得
+            //        string url = AdjustURL(this.Config.Url);    // 末尾の/を取り除くいてURLを調整する
 
-                    // WordPressの記事とアナリティクスデータの各URLが一致するものを取り出す
-                    var tmp = (from x in this.AnalyticsList.GoogleAnalyticsItems.Items
-                               where (url + x.Page).Equals(link)
-                               select x).FirstOrDefault();
+            //        // WordPressの記事とアナリティクスデータの各URLが一致するものを取り出す
+            //        var tmp = (from x in this.AnalyticsList.GoogleAnalyticsItems.Items
+            //                   where (url + x.Page).Equals(link)
+            //                   select x).FirstOrDefault();
 
-                    // 一致する場合
-                    if (tmp != null)
-                    {
-                        // ワードプレス記事とアナリティクスデータを結合して登録
-                        cmb.Add(article, tmp);
-                    }
-                    // 一致しない場合
-                    else
-                    {
-                        // ワードプレス記事を登録する
-                        // アナリティクスデータはないので全て0で登録
-                        cmb.Add(article, new GoogleAnalyticsM());
-                    }
-                }
+            //        // 一致する場合
+            //        if (tmp != null)
+            //        {
+            //            // ワードプレス記事とアナリティクスデータを結合して登録
+            //            cmb.Add(article, tmp);
+            //        }
+            //        // 一致しない場合
+            //        else
+            //        {
+            //            // ワードプレス記事を登録する
+            //            // アナリティクスデータはないので全て0で登録
+            //            cmb.Add(article, new GoogleAnalyticsM());
+            //        }
+            //    }
 
-                this.CombineData.CombineDataList.Items 
-                    = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
-                                                                                                                                orderby x.Analytics.PageView, x.WordPress.Id
-                                                                                                                                select x).ToList());
+            //    this.CombineData.CombineDataList.Items 
+            //        = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
+            //                                                                                                                    orderby x.Analytics.PageView, x.WordPress.Id
+            //                                                                                                                    select x).ToList());
             }
             catch (Exception e)
             {
@@ -568,13 +647,13 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength2;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.TitleLength;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageView;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.UniquePageView;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.StayTime;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageViewStart;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.ReturnRatio;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.LeaveRatio;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageValue;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageViews;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.UniquePageviews;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.AvgTimeOnPage;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.Entrances;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.Exits;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.ExitRate;
+                        //book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageValue;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.LengthCheck;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.KeywordCheck;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Link;
@@ -624,19 +703,6 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
 
-        /// <summary>
-        /// GoogleAnalyticsの結果取得
-        /// </summary>
-        public void GetAnalytics()
-        {
-            try
-            {
-                var result = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
-            }
-            catch (Exception e)
-            {
-                ShowMessage.ShowErrorOK(e.Message, "Error");
-            }
-        }
+
     }
 }
