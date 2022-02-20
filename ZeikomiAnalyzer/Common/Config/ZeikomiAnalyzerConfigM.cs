@@ -213,6 +213,132 @@ namespace ZeikomiAnalyzer.Common.Config
 		}
 		#endregion
 
+		#region 固定ページ出力処理[PageOut]プロパティ
+		/// <summary>
+		/// 固定ページ出力処理[PageOut]プロパティ用変数
+		/// </summary>
+		bool _PageOut = true;
+		/// <summary>
+		/// 固定ページ出力処理[PageOut]プロパティ
+		/// </summary>
+		public bool PageOut
+		{
+			get
+			{
+				return _PageOut;
+			}
+			set
+			{
+				if (!_PageOut.Equals(value))
+				{
+					_PageOut = value;
+					NotifyPropertyChanged("PageOut");
+				}
+			}
+		}
+		#endregion
+		#region 固定ページ出力処理[IsPageForZeroOut]プロパティ
+		/// <summary>
+		/// 固定ページ出力処理[IsPageForZeroOut]プロパティ用変数
+		/// </summary>
+		bool _IsPageForZeroOut = true;
+		/// <summary>
+		/// 固定ページ出力処理[IsPageForZeroOut]プロパティ
+		/// </summary>
+		public bool IsPageForZeroOut
+		{
+			get
+			{
+				return _IsPageForZeroOut;
+			}
+			set
+			{
+				if (!_IsPageForZeroOut.Equals(value))
+				{
+					_IsPageForZeroOut = value;
+					NotifyPropertyChanged("IsPageForZeroOut");
+				}
+			}
+		}
+		#endregion
+
+		#region 投稿出力処理[IsPostForZeroOut]プロパティ
+		/// <summary>
+		/// 投稿出力処理[IsPostForZeroOut]プロパティ用変数
+		/// </summary>
+		bool _IsPostForZeroOut = true;
+		/// <summary>
+		/// 投稿出力処理[IsPostForZeroOut]プロパティ
+		/// </summary>
+		public bool IsPostForZeroOut
+		{
+			get
+			{
+				return _IsPostForZeroOut;
+			}
+			set
+			{
+				if (!_IsPostForZeroOut.Equals(value))
+				{
+					_IsPostForZeroOut = value;
+					NotifyPropertyChanged("IsPostForZeroOut");
+				}
+			}
+		}
+		#endregion
+
+		#region 出力するカテゴリ[OutputCategoryType]プロパティ
+		/// <summary>
+		/// 出力するカテゴリ[OutputCategoryType]プロパティ用変数
+		/// </summary>
+		string _OutputCategoryType = string.Empty;
+		/// <summary>
+		/// 出力するカテゴリ[OutputCategoryType]プロパティ
+		/// </summary>
+		public string OutputCategoryType
+		{
+			get
+			{
+				return _OutputCategoryType;
+			}
+			set
+			{
+				if (_OutputCategoryType == null || !_OutputCategoryType.Equals(value))
+				{
+					_OutputCategoryType = value;
+					NotifyPropertyChanged("OutputCategoryType");
+				}
+			}
+		}
+		#endregion
+
+		#region ハッシュタグ[HashtagZeroOut]プロパティ
+		/// <summary>
+		/// ハッシュタグ[HashtagZeroOut]プロパティ用変数
+		/// </summary>
+		string _HashtagZeroOut = string.Empty;
+		/// <summary>
+		/// ハッシュタグ[HashtagZeroOut]プロパティ
+		/// </summary>
+		public string HashtagZeroOut
+		{
+			get
+			{
+				return _HashtagZeroOut;
+			}
+			set
+			{
+				if (_HashtagZeroOut == null || !_HashtagZeroOut.Equals(value))
+				{
+					_HashtagZeroOut = value;
+					NotifyPropertyChanged("HashtagZeroOut");
+				}
+			}
+		}
+		#endregion
+
+
+
 
 
 
@@ -254,6 +380,10 @@ namespace ZeikomiAnalyzer.Common.Config
 					this.TitleLengthMax = conf.TitleLengthMax;
 					this.GoogleAnalyticsPrivateKey = conf.GoogleAnalyticsPrivateKey;
 					this.ViewId = conf.ViewId;
+					this.IsPageForZeroOut = conf.IsPageForZeroOut;
+					this.IsPostForZeroOut = conf.IsPostForZeroOut;
+					this.OutputCategoryType = conf.OutputCategoryType;
+					this.HashtagZeroOut = conf.HashtagZeroOut;
 				}
 			}
 			catch (Exception e)

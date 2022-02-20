@@ -335,10 +335,12 @@
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
                                         </Button>
-                                        <CheckBox Margin="5" Content="固定ページ"/>
-                                        <CheckBox Margin="5" Content="投稿ページ"/>
+                                        <CheckBox Margin="5" Content="固定ページ" IsChecked="{Binding Config.IsPageForZeroOut}"/>
+                                        <CheckBox Margin="5" Content="投稿ページ" IsChecked="{Binding Config.IsPostForZeroOut}"/>
                                         <TextBlock Margin="5" VerticalAlignment="Center" Text="カテゴリ(Idで指定):"/>
-                                        <TextBox Margin="5" VerticalAlignment="Center" Width="100" Text=""/>
+                                        <TextBox Margin="5" VerticalAlignment="Center" Width="100" Text="{Binding Config.OutputCategoryType}"/>
+                                        <TextBlock Margin="5" VerticalAlignment="Center" Text="ハッシュタグ:"/>
+                                        <TextBox Margin="5" VerticalAlignment="Center" Width="100" Text="{Binding Config.HashtagZeroOut}" Cursor="IBeam"/>
                                     </StackPanel>
                                 </Grid>
                                 <TextBox Margin="5" Background="WhiteSmoke" Grid.Column="1" 

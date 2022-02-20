@@ -174,7 +174,6 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
-
         #region GoogleAnalytics検索条件[AnalyticsSearchCondition]プロパティ
         /// <summary>
         /// GoogleAnalytics検索条件[AnalyticsSearchCondition]プロパティ用変数
@@ -200,9 +199,6 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
-
-
-
         #region 初期化処理
         /// <summary>
         /// 初期化処理
@@ -225,6 +221,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 }
 
                 this.AnalyticsSearchCondition.ViewId = this.Config.ViewId;
+                
             }
             catch (Exception e)
             {
@@ -690,9 +687,41 @@ namespace ZeikomiAnalyzer.ViewModels
 
                     foreach (var tmp in this.Articles.ZeroTitles.Items)
                     {
+                        // 投稿の出力をしない場合
+                        if (tmp.Type.Equals("post") && !this.Config.IsPostForZeroOut)
+                            continue;
+
+                        // 固定ページの出力をしない場合
+                        if (tmp.Type.Equals("page") && !this.Config.IsPageForZeroOut)
+                            continue;
+
+                        if (!string.IsNullOrEmpty(this.Config.OutputCategoryType))
+                        {
+                            // カテゴリがセットされていないので対象外
+                            if (tmp.Categories == null)
+                                continue;
+
+                            bool is_execute = false;
+                            foreach (var cate in tmp.Categories)
+                            {
+                                if ((from x in this.Config.OutputCategoryType.Split(",")
+                                     where x.Trim().Equals(cate.ToString())
+                                     select x).Any()
+                                    )
+                                {
+                                    is_execute = true;
+                                    break;
+                                }
+                            }
+
+                            // カテゴリが合致しなかった
+                            if (!is_execute)
+                                continue;
+                        }
+
                         col = 1;
                         row++;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = "#プログラマーやめました #ランダム送信\r\n" + tmp.Title;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = this.Config.HashtagZeroOut + "\r\n" + tmp.Title;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Link;
                     }
 
