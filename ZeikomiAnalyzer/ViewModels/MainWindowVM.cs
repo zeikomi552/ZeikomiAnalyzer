@@ -18,6 +18,7 @@ using ZeikomiAnalyzer.Models;
 using Google.Apis.AnalyticsReporting.v4;
 using Google.Apis.AnalyticsReporting.v4.Data;
 using Google.Apis.Auth.OAuth2;
+using Twapi.Twitter;
 
 namespace ZeikomiAnalyzer.ViewModels
 {
@@ -198,6 +199,35 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
         #endregion
+
+        #region ツイッターのツイートタイムライン[TweetTimeline]プロパティ
+        /// <summary>
+        /// ツイッターのツイートタイムライン[TweetTimeline]プロパティ用変数
+        /// </summary>
+        ModelList<CoreTweet.Status> _TweetTimeline = new ModelList<CoreTweet.Status>();
+        /// <summary>
+        /// ツイッターのツイートタイムライン[TweetTimeline]プロパティ
+        /// </summary>
+        public ModelList<CoreTweet.Status> TweetTimeline
+        {
+            get
+            {
+                return _TweetTimeline;
+            }
+            set
+            {
+                if (_TweetTimeline == null || !_TweetTimeline.Equals(value))
+                {
+                    _TweetTimeline = value;
+                    NotifyPropertyChanged("TweetTimeline");
+                }
+            }
+        }
+        #endregion
+
+
+
+
 
         #region 初期化処理
         /// <summary>
@@ -581,9 +611,29 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region ツイートの取得処理
+        /// <summary>
+        /// ツイートの取得処理
+        /// </summary>
+        public void GetTweet()
+        {
+            try
+            {
+                var tmp = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
 
+                this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(tmp);
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+        #endregion
 
-
+        #region 行のダブルクリック処理
+        /// <summary>
+        /// 行のダブルクリック処理
+        /// </summary>
         public void RowDoubleClick()
         {
             try
@@ -601,6 +651,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+        #endregion
 
 
         public void SaveExcel()

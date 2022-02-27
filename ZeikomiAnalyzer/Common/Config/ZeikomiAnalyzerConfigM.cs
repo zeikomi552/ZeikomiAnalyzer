@@ -237,6 +237,7 @@ namespace ZeikomiAnalyzer.Common.Config
 			}
 		}
 		#endregion
+
 		#region 固定ページ出力処理[IsPageForZeroOut]プロパティ
 		/// <summary>
 		/// 固定ページ出力処理[IsPageForZeroOut]プロパティ用変数
@@ -338,6 +339,131 @@ namespace ZeikomiAnalyzer.Common.Config
 		#endregion
 
 
+		#region ツイッター用コンシューマーキー[TwConsumerKey]プロパティ
+		/// <summary>
+		/// ツイッター用コンシューマーキー[TwConsumerKey]プロパティ用変数
+		/// </summary>
+		string _TwConsumerKey = string.Empty;
+		/// <summary>
+		/// ツイッター用コンシューマーキー[TwConsumerKey]プロパティ
+		/// </summary>
+		public string TwConsumerKey
+		{
+			get
+			{
+				return _TwConsumerKey;
+			}
+			set
+			{
+				if (_TwConsumerKey == null || !_TwConsumerKey.Equals(value))
+				{
+					_TwConsumerKey = value;
+					NotifyPropertyChanged("TwConsumerKey");
+				}
+			}
+		}
+		#endregion
+
+		#region ツイッター用コンシューマーシークレット[TwConsumerSecret]プロパティ
+		/// <summary>
+		/// ツイッター用コンシューマーシークレット[TwConsumerSecret]プロパティ用変数
+		/// </summary>
+		string _TwConsumerSecret = string.Empty;
+		/// <summary>
+		/// ツイッター用コンシューマーシークレット[TwConsumerSecret]プロパティ
+		/// </summary>
+		public string TwConsumerSecret
+		{
+			get
+			{
+				return _TwConsumerSecret;
+			}
+			set
+			{
+				if (_TwConsumerSecret == null || !_TwConsumerSecret.Equals(value))
+				{
+					_TwConsumerSecret = value;
+					NotifyPropertyChanged("TwConsumerSecret");
+				}
+			}
+		}
+		#endregion
+
+		#region ツイッター用アクセストークン[TwAccessToken]プロパティ
+		/// <summary>
+		/// ツイッター用アクセストークン[TwAccessToken]プロパティ用変数
+		/// </summary>
+		string _TwAccessToken = string.Empty;
+		/// <summary>
+		/// ツイッター用アクセストークン[TwAccessToken]プロパティ
+		/// </summary>
+		public string TwAccessToken
+		{
+			get
+			{
+				return _TwAccessToken;
+			}
+			set
+			{
+				if (_TwAccessToken == null || !_TwAccessToken.Equals(value))
+				{
+					_TwAccessToken = value;
+					NotifyPropertyChanged("TwAccessToken");
+				}
+			}
+		}
+		#endregion
+
+		#region ツイッター用アクセスシークレット[TwAccessSecret]プロパティ
+		/// <summary>
+		/// ツイッター用アクセスシークレット[TwAccessSecret]プロパティ用変数
+		/// </summary>
+		string _TwAccessSecret = string.Empty;
+		/// <summary>
+		/// ツイッター用アクセスシークレット[TwAccessSecret]プロパティ
+		/// </summary>
+		public string TwAccessSecret
+		{
+			get
+			{
+				return _TwAccessSecret;
+			}
+			set
+			{
+				if (_TwAccessSecret == null || !_TwAccessSecret.Equals(value))
+				{
+					_TwAccessSecret = value;
+					NotifyPropertyChanged("TwAccessSecret");
+				}
+			}
+		}
+		#endregion
+
+		#region ツイッター用スクリーン名[TwScreenName]プロパティ
+		/// <summary>
+		/// ツイッター用スクリーン名[TwScreenName]プロパティ用変数
+		/// </summary>
+		string _TwScreenName = string.Empty;
+		/// <summary>
+		/// ツイッター用スクリーン名[TwScreenName]プロパティ
+		/// </summary>
+		public string TwScreenName
+		{
+			get
+			{
+				return _TwScreenName;
+			}
+			set
+			{
+				if (_TwScreenName == null || !_TwScreenName.Equals(value))
+				{
+					_TwScreenName = value;
+					NotifyPropertyChanged("TwScreenName");
+				}
+			}
+		}
+		#endregion
+
 
 
 
@@ -384,6 +510,12 @@ namespace ZeikomiAnalyzer.Common.Config
 					this.IsPostForZeroOut = conf.IsPostForZeroOut;
 					this.OutputCategoryType = conf.OutputCategoryType;
 					this.HashtagZeroOut = conf.HashtagZeroOut;
+
+					this.TwConsumerKey = conf.TwConsumerKey;
+					this.TwConsumerSecret = conf.TwConsumerSecret;
+					this.TwAccessToken = conf.TwAccessToken;
+					this.TwAccessSecret = conf.TwAccessSecret;
+					this.TwScreenName = conf.TwScreenName;
 				}
 			}
 			catch (Exception e)

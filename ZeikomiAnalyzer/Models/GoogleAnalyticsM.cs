@@ -3,6 +3,7 @@ using Google.Apis.AnalyticsReporting.v4.Data;
 using MVVMCore.BaseClass;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -307,25 +308,158 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region 対象日時[TargetDate]プロパティ
+		/// <summary>
+		/// 対象日時[TargetDate]プロパティ用変数
+		/// </summary>
+		DateTime _TargetDate = DateTime.MinValue;
+		/// <summary>
+		/// 対象日時[TargetDate]プロパティ
+		/// </summary>
+		public DateTime TargetDate
+		{
+			get
+			{
+				return _TargetDate;
+			}
+			set
+			{
+				if (!_TargetDate.Equals(value))
+				{
+					_TargetDate = value;
+					NotifyPropertyChanged("TargetDate");
+				}
+			}
+		}
+		#endregion
+
+		//#region ソーシャルネットワークのアクション[SocialAction]プロパティ
+		///// <summary>
+		///// ソーシャルネットワークのアクション[SocialAction]プロパティ用変数
+		///// </summary>
+		//string _SocialAction = string.Empty;
+		///// <summary>
+		///// ソーシャルネットワークのアクション[SocialAction]プロパティ
+		///// </summary>
+		//public string SocialAction
+		//{
+		//	get
+		//	{
+		//		return _SocialAction;
+		//	}
+		//	set
+		//	{
+		//		if (_SocialAction == null || !_SocialAction.Equals(value))
+		//		{
+		//			_SocialAction = value;
+		//			NotifyPropertyChanged("SocialAction");
+		//		}
+		//	}
+		//}
+		//#endregion
+
+		#region デフォルトチャネルグループ[DefaultChannelGroup]プロパティ
+		/// <summary>
+		/// デフォルトチャネルグループ[DefaultChannelGroup]プロパティ用変数
+		/// </summary>
+		string _DefaultChannelGroup = string.Empty;
+		/// <summary>
+		/// デフォルトチャネルグループ[DefaultChannelGroup]プロパティ
+		/// </summary>
+		public string DefaultChannelGroup
+		{
+			get
+			{
+				return _DefaultChannelGroup;
+			}
+			set
+			{
+				if (_DefaultChannelGroup == null || !_DefaultChannelGroup.Equals(value))
+				{
+					_DefaultChannelGroup = value;
+					NotifyPropertyChanged("DefaultChannelGroup");
+				}
+			}
+		}
+		#endregion
+
+		#region ソーシャルネットワーク[SocialNetwork]プロパティ
+		/// <summary>
+		/// ソーシャルネットワーク[SocialNetwork]プロパティ用変数
+		/// </summary>
+		string _SocialNetwork = string.Empty;
+		/// <summary>
+		/// ソーシャルネットワーク[SocialNetwork]プロパティ
+		/// </summary>
+		public string SocialNetwork
+		{
+			get
+			{
+				return _SocialNetwork;
+			}
+			set
+			{
+				if (_SocialNetwork == null || !_SocialNetwork.Equals(value))
+				{
+					_SocialNetwork = value;
+					NotifyPropertyChanged("SocialNetwork");
+				}
+			}
+		}
+		#endregion
+
+		#region ランディングページ[LandingPage]プロパティ
+		/// <summary>
+		/// ランディングページ[LandingPage]プロパティ用変数
+		/// </summary>
+		string _LandingPage = string.Empty;
+		/// <summary>
+		/// ランディングページ[LandingPage]プロパティ
+		/// </summary>
+		public string LandingPage
+		{
+			get
+			{
+				return _LandingPage;
+			}
+			set
+			{
+				if (_LandingPage == null || !_LandingPage.Equals(value))
+				{
+					_LandingPage = value;
+					NotifyPropertyChanged("LandingPage");
+				}
+			}
+		}
+		#endregion
+
+
+
 
 
 		public void SetValue(ReportRow row)
         {
-            this.Page = row.Dimensions.ElementAt(0);
-            this.PageTitle = row.Dimensions.ElementAt(1);
+			DateTime result = DateTime.MinValue;
+			this.TargetDate = DateTime.TryParseExact(row.Dimensions.ElementAt(0), "yyyyMMdd", null, DateTimeStyles.None, out result) ? result : DateTime.MinValue;
+			this.Page = row.Dimensions.ElementAt(1);
+            this.PageTitle = row.Dimensions.ElementAt(2);
+			this.LandingPage = row.Dimensions.ElementAt(3);
+
+			this.DefaultChannelGroup = row.Dimensions.ElementAt(4);
+			this.SocialNetwork = row.Dimensions.ElementAt(5);
 
 
 
 
-            this.PageViews = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(0));
-            this.Entrances = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(1));
-			this.EntranceRate = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(2));
-			this.PageViewsPerSession = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(3));
-			this.UniquePageviews = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(4));
-			this.TimeOnPage = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(5));
-			this.AvgTimeOnPage = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(6));
-			this.Exits = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(7));
-			this.ExitRate = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(8));
+			this.PageViews = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(0));
+   //         this.Entrances = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(1));
+			//this.EntranceRate = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(2));
+			//this.PageViewsPerSession = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(3));
+			//this.UniquePageviews = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(4));
+			//this.TimeOnPage = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(5));
+			//this.AvgTimeOnPage = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(6));
+			//this.Exits = int.Parse(row.Metrics.ElementAt(0).Values.ElementAt(7));
+			//this.ExitRate = double.Parse(row.Metrics.ElementAt(0).Values.ElementAt(8));
 		}
 
 

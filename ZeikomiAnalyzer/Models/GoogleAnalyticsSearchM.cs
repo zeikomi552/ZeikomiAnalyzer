@@ -91,6 +91,45 @@ namespace ZeikomiAnalyzer.Models
 		/// <returns>取得結果</returns>
 		public List<GetReportsResponse> GetAnalytics(string key_json)
 		{
+			var dimensions = new[] {
+					new Dimension { Name = "ga:date" },
+					new Dimension { Name = "ga:pagePath" },
+					new Dimension { Name = "ga:pageTitle" },
+					new Dimension { Name = "ga:landingPagePath" },
+					new Dimension { Name = "ga:channelGrouping" },
+					new Dimension { Name = "ga:socialNetwork" },
+				};
+
+			// メトリクスのセット
+			// 参考：https://ga-dev-tools.web.app/dimensions-metrics-explorer/
+			var metrics = new[] {
+					//new Metric { Expression = "ga:pageviews" },
+					//new Metric { Expression = "ga:entrances" },
+					//new Metric { Expression = "ga:entranceRate" },
+					//new Metric { Expression = "ga:pageviewsPerSession" },
+					//new Metric { Expression = "ga:uniquePageviews" },
+					//new Metric { Expression = "ga:timeOnPage" },
+					//new Metric { Expression = "ga:avgTimeOnPage" },
+					//new Metric { Expression = "ga:exits" },
+					//new Metric { Expression = "ga:exitRate" }
+					new Metric { Expression = "ga:pageviews" },
+				};
+
+			// データの取得期間のセット
+			var date_ranges = new[] {
+					new DateRange {
+						StartDate = this.SearchStart.ToString("yyyy-MM-dd"),
+						EndDate = this.SearchEnd.ToString("yyyy-MM-dd") }
+				};
+
+			var ret = GetAnalytics(key_json, this.ViewId, dimensions, metrics, date_ranges);
+
+			return ret;
+		}
+		#endregion
+
+		private static List<GetReportsResponse> GetAnalytics(string key_json, string view_id, IList<Dimension> dimensions, IList<Metric> metrics, IList<DateRange> daterange)
+		{
 			List<GetReportsResponse> result = new List<GetReportsResponse>();
 
 			string next_token = string.Empty;
@@ -111,36 +150,19 @@ namespace ZeikomiAnalyzer.Models
 				GetReportsRequest request = new GetReportsRequest();
 
 				ReportRequest report_request = new ReportRequest();
-				report_request.ViewId = this.ViewId;            // Google Analytics ViewId
+				report_request.ViewId = view_id;            // Google Analytics ViewId
 				report_request.PageToken = next_token;
 
 				// ディメンションのセット
 				// 参考：https://ga-dev-tools.web.app/dimensions-metrics-explorer/
-				report_request.Dimensions = new[] {
-					new Dimension { Name = "ga:pagePath" },
-					new Dimension { Name = "ga:pageTitle" }
-				};
+				report_request.Dimensions = dimensions;
 
 				// メトリクスのセット
 				// 参考：https://ga-dev-tools.web.app/dimensions-metrics-explorer/
-				report_request.Metrics = new[] {
-					new Metric { Expression = "ga:pageviews" },
-					new Metric { Expression = "ga:entrances" },
-					new Metric { Expression = "ga:entranceRate" },
-					new Metric { Expression = "ga:pageviewsPerSession" },
-					new Metric { Expression = "ga:uniquePageviews" },
-					new Metric { Expression = "ga:timeOnPage" },
-					new Metric { Expression = "ga:avgTimeOnPage" },
-					new Metric { Expression = "ga:exits" },
-					new Metric { Expression = "ga:exitRate" }
-				};
+				report_request.Metrics = metrics;
 
 				// データの取得期間のセット
-				report_request.DateRanges = new[] {
-					new DateRange {
-						StartDate = this.SearchStart.ToString("yyyy-MM-dd"),
-						EndDate = this.SearchEnd.ToString("yyyy-MM-dd") }
-				};
+				report_request.DateRanges = daterange;
 
 				//// ソート順 日付で昇順
 				//report_request.OrderBys = new[] {
@@ -162,6 +184,5 @@ namespace ZeikomiAnalyzer.Models
 			// 実行
 			return result;
 		}
-		#endregion
 	}
 }

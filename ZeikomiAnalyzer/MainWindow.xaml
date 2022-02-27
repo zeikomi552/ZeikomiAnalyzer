@@ -9,8 +9,9 @@
         xmlns:local="clr-namespace:ZeikomiAnalyzer"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:ViewModels="clr-namespace:ZeikomiAnalyzer.ViewModels" x:Class="ZeikomiAnalyzer.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1200">
+        Title="MainWindow" Height="1000" Width="1500">
     <mah:MetroWindow.Resources>
+        <Converters:CoreTweetStatusToUrlstringConverter x:Key="CoreTweetStatusToUrlstringConverter"/>
         <Converters:boolToMaruBatsuConverter x:Key="boolToMaruBatsuConverter"/>
         <Converters:boolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
         <Converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
@@ -34,6 +35,7 @@
         </Grid.RowDefinitions>
         <Grid Margin="5" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -140,6 +142,65 @@
 
                 </Grid>
             </GroupBox>
+            <GroupBox Grid.Column="2" Margin="5" Header="WordPress">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock TextAlignment="Right" Margin="5" Width="100" VerticalAlignment="Center" Text="スクリーン名"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <TextBox Width="100" Margin="5" VerticalAlignment="Center" Text="{Binding Config.TwScreenName}" Cursor="IBeam"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock TextAlignment="Right" Margin="5" Width="100" VerticalAlignment="Center" Text="コンシューマーキー"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <Grid>
+                            <TextBox Margin="5" Visibility="{Binding IsChecked, Converter={StaticResource boolToVisibilityConverter}, ElementName=toggleButton3}" VerticalAlignment="Center" Width="250" Text="{Binding Config.TwConsumerKey}" Cursor="IBeam"/>
+                            <PasswordBox Width="250" hlp:PasswordBoxHelper.IsAttached="True" hlp:PasswordBoxHelper.Password="{Binding Config.TwConsumerKey}" 
+                                             Margin="5" VerticalAlignment="Center" Cursor="IBeam" Visibility="{Binding IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}, ElementName=toggleButton3}"/>
+                        </Grid>
+                        <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton3" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock TextAlignment="Right" Margin="5" Width="100" VerticalAlignment="Center" Text="コンシューマーシークレット"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <Grid>
+                            <TextBox Margin="5" Visibility="{Binding IsChecked, Converter={StaticResource boolToVisibilityConverter}, ElementName=toggleButton4}" VerticalAlignment="Center" Width="250" Text="{Binding Config.TwConsumerSecret}" Cursor="IBeam"/>
+                            <PasswordBox Width="250" hlp:PasswordBoxHelper.IsAttached="True" hlp:PasswordBoxHelper.Password="{Binding Config.TwConsumerSecret}" 
+                                             Margin="5" VerticalAlignment="Center" Cursor="IBeam" Visibility="{Binding IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}, ElementName=toggleButton4}"/>
+                        </Grid>
+                        <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton4" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock TextAlignment="Right" Margin="5" Width="100" VerticalAlignment="Center" Text="アクセストークン"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <Grid>
+                            <TextBox Margin="5" Visibility="{Binding IsChecked, Converter={StaticResource boolToVisibilityConverter}, ElementName=toggleButton5}" VerticalAlignment="Center" Width="250" Text="{Binding Config.TwAccessToken}" Cursor="IBeam"/>
+                            <PasswordBox Width="250" hlp:PasswordBoxHelper.IsAttached="True" hlp:PasswordBoxHelper.Password="{Binding Config.TwAccessToken}" 
+                                             Margin="5" VerticalAlignment="Center" Cursor="IBeam" Visibility="{Binding IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}, ElementName=toggleButton5}"/>
+                        </Grid>
+                        <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton5" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock TextAlignment="Right" Margin="5" Width="100" VerticalAlignment="Center" Text="アクセスシークレット"/>
+                        <TextBlock Margin="5" VerticalAlignment="Center" Text=":"/>
+                        <Grid>
+                            <TextBox Margin="5" Visibility="{Binding IsChecked, Converter={StaticResource boolToVisibilityConverter}, ElementName=toggleButton6}" VerticalAlignment="Center" Width="250" Text="{Binding Config.TwAccessSecret}" Cursor="IBeam"/>
+                            <PasswordBox Width="250" hlp:PasswordBoxHelper.IsAttached="True" hlp:PasswordBoxHelper.Password="{Binding Config.TwAccessSecret}" 
+                                             Margin="5" VerticalAlignment="Center" Cursor="IBeam" Visibility="{Binding IsChecked, Converter={StaticResource InverseBoolToVisibilityConverter}, ElementName=toggleButton6}"/>
+                        </Grid>
+                        <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton6" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="5" Width="100" Content="ツイート取得" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}">
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="Click">
+                                    <b:CallMethodAction TargetObject="{Binding}" MethodName="GetTweet"/>
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -196,12 +257,12 @@
                                                 <DataGridTextColumn Header="文字数" Binding="{Binding WordPress.ContentLength, Mode=OneWay}"/>
                                                 <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding WordPress.ContentLength2, Mode=OneWay}"/>
                                                 <DataGridTextColumn Header="タイトル文字数" Binding="{Binding WordPress.TitleLength, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="ページビュー" Binding="{Binding Analytics.PageView}"/>
+                                                <!--<DataGridTextColumn Header="ページビュー" Binding="{Binding Analytics.PageView}"/>
                                                 <DataGridTextColumn Header="平均滞在時間" Binding="{Binding Analytics.StayTime}"/>
                                                 <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Analytics.PageViewStart}"/>
                                                 <DataGridTextColumn Header="直帰率" Binding="{Binding Analytics.ReturnRatio}"/>
                                                 <DataGridTextColumn Header="離脱率" Binding="{Binding Analytics.LeaveRatio}"/>
-                                                <DataGridTextColumn Header="ページの価値" Binding="{Binding Analytics.PageValue}"/>
+                                                <DataGridTextColumn Header="ページの価値" Binding="{Binding Analytics.PageValue}"/>-->
                                                 <DataGridTextColumn Header="URL" Binding="{Binding WordPress.Link}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
@@ -297,13 +358,18 @@
                         <TabItem Header="アナリティクス">
                             <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding Articles.Analytics.Items}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ページ" Binding="{Binding Page}"/>
-                                    <DataGridTextColumn Header="ページタイトル" Binding="{Binding PageTitle}"/>
+                                    <DataGridTextColumn Header="対象日" Binding="{Binding TargetDate}"/>
+                                    <DataGridTextColumn Header="Group" Binding="{Binding DefaultChannelGroup}"/>
+                                    <DataGridTextColumn Header="SocialNetwork" Binding="{Binding SocialNetwork}"/>
+                                    <DataGridTextColumn Width="100" Header="ページ" Binding="{Binding Page}"/>
+                                    <DataGridTextColumn Width="300" Header="ページタイトル" Binding="{Binding PageTitle}"/>
+                                    <DataGridTextColumn Header="ランディングページ" Binding="{Binding LandingPage}"/>
                                     <DataGridTextColumn Header="ページビュー数" Binding="{Binding PageViews}"/>
+                                    <!--
                                     <DataGridTextColumn Header="ページ別訪問数" Binding="{Binding PageViewsPerSession}"/>
                                     <DataGridTextColumn Header="平均ページ滞在時間" Binding="{Binding AvgTimeOnPage}"/>
                                     <DataGridTextColumn Header="閲覧開始数" Binding="{Binding Entrances}"/>
-                                    <DataGridTextColumn Header="離脱率" Binding="{Binding ExitRate}"/>
+                                    <DataGridTextColumn Header="離脱率" Binding="{Binding ExitRate}"/>-->
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -347,6 +413,21 @@
                                          IsReadOnly="False" AcceptsReturn="True" Text="{Binding Articles.ZeroTitles.SelectedItem.Contents}" Cursor="IBeam"/>
                             </Grid>
 
+                        </TabItem>
+                        <TabItem Header="ツイート内容">
+                            <Grid>
+                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding TweetTimeline.Items}"
+                                  SelectedItem="{Binding TweetTimeline.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="ツイート日時" Binding="{Binding CreatedAt.LocalDateTime}"/>
+                                        <DataGridTextColumn Header="ツイート内容" Binding="{Binding Text}"/>
+                                        <DataGridTextColumn Header="いいね数" Binding="{Binding FavoriteCount}"/>
+                                        <DataGridTextColumn Header="リツイート数" Binding="{Binding RetweetCount}"/>
+                                        <DataGridTextColumn Header="URL" Binding="{Binding Converter={StaticResource CoreTweetStatusToUrlstringConverter}, Mode=OneWay}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </TabItem>
 
                     </TabControl>
