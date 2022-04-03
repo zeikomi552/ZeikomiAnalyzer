@@ -92,6 +92,10 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region 記事の内容からHTMLタグを取り除いたもの
+		/// <summary>
+		/// 記事の内容からHTMLタグを取り除いたもの
+		/// </summary>
 		public string ContentsEx
 		{
 			get
@@ -99,6 +103,7 @@ namespace ZeikomiAnalyzer.Models
 				return Regex.Replace(this.Contents, "<[^>]*?>", "");
 			}
 		}
+		#endregion
 
 		#region リンク[Link]プロパティ
 		/// <summary>
@@ -149,6 +154,7 @@ namespace ZeikomiAnalyzer.Models
 			}
 		}
 		#endregion
+
 		#region カテゴリ[Categories]プロパティ
 		/// <summary>
 		/// カテゴリ[Categories]プロパティ用変数
@@ -175,6 +181,10 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region カテゴリ情報
+		/// <summary>
+		/// カテゴリ情報
+		/// </summary>
 		public string CategoriesText
         {
             get
@@ -203,14 +213,15 @@ namespace ZeikomiAnalyzer.Models
 
 			}
 		}
+        #endregion
 
 
 
-		#region 記事の長さ
-		/// <summary>
-		/// 記事の長さ
-		/// </summary>
-		public int ContentLength
+        #region 記事の長さ
+        /// <summary>
+        /// 記事の長さ
+        /// </summary>
+        public int ContentLength
         {
 			get
 			{

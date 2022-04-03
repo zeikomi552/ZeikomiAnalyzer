@@ -584,7 +584,9 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-                CombineDataCollectionM cmb = new CombineDataCollectionM();
+
+                //this.Articles.AddAnalytics
+                //CombineDataCollectionM cmb = new CombineDataCollectionM();
                 // データのクリア
                 //this.CombineData.Clear();
 
