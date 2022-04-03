@@ -442,38 +442,8 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-                // ニート記事一覧の初期化
-                this.Articles.ZeroTitles.Items.Clear();
-
-                foreach (var article in this.Articles.Pages.Items)
-                {
-                    string slug = "/" + article.Slug + "/";
-
-                    // 一部一致のものを探す //amp=等の対策
-                    if ((from x in this.Articles.Analytics.Items
-                         where x.Page.Contains(slug)
-                         select x).Any())
-                    {
-                        continue;
-                    }
-
-                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "page");
-                }
-
-                foreach (var article in this.Articles.Posts.Items)
-                {
-                    string slug = "/" + article.Slug + "/";
-
-                    // 一部一致のものを探す //amp=等の対策
-                    if ((from x in this.Articles.Analytics.Items
-                         where x.Page.Contains(slug)
-                         select x).Any())
-                    {
-                        continue;
-                    }
-
-                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", article.Categories);
-                }
+                // ニート記事の抽出
+                this.Articles.OutputNeet();
             }
             catch (Exception e)
             {
@@ -584,42 +554,8 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-
-                //this.Articles.AddAnalytics
-                //CombineDataCollectionM cmb = new CombineDataCollectionM();
-                // データのクリア
-                //this.CombineData.Clear();
-
-                //    // 記事数分回す
-                //    foreach (var article in this.Articles.Articles.Items)
-                //    {
-                //        string link = article.Link;                 // リンク情報の取得
-                //        string url = AdjustURL(this.Config.Url);    // 末尾の/を取り除くいてURLを調整する
-
-                //        // WordPressの記事とアナリティクスデータの各URLが一致するものを取り出す
-                //        var tmp = (from x in this.AnalyticsList.GoogleAnalyticsItems.Items
-                //                   where (url + x.Page).Equals(link)
-                //                   select x).FirstOrDefault();
-
-                //        // 一致する場合
-                //        if (tmp != null)
-                //        {
-                //            // ワードプレス記事とアナリティクスデータを結合して登録
-                //            cmb.Add(article, tmp);
-                //        }
-                //        // 一致しない場合
-                //        else
-                //        {
-                //            // ワードプレス記事を登録する
-                //            // アナリティクスデータはないので全て0で登録
-                //            cmb.Add(article, new GoogleAnalyticsM());
-                //        }
-                //    }
-
-                //    this.CombineData.CombineDataList.Items 
-                //        = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
-                //                                                                                                                    orderby x.Analytics.PageView, x.WordPress.Id
-                //                                                                                                                    select x).ToList());
+                this.Articles.CombineAnalyticsItems.Items.Clear();
+                this.Articles.CombineArticleAndAnalytics();
             }
             catch (Exception e)
             {
@@ -689,7 +625,7 @@ namespace ZeikomiAnalyzer.ViewModels
             {
                 ProcessStartInfo pi = new ProcessStartInfo()
                 {
-                    FileName = this.CombineData.CombineDataList.SelectedItem.WordPress.Link,
+                    FileName = this.Articles.CombineAnalyticsItems.SelectedItem.Link,
                     UseShellExecute = true,
                 };
 
@@ -726,36 +662,22 @@ namespace ZeikomiAnalyzer.ViewModels
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数(タグ除外)";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル文字数";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページビュー数";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページ別訪問数";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "平均滞在時間";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "閲覧開始数";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "直帰率";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "離脱率";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページの価値";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル長チェック";
-                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトルキーワード";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイッターPV";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "オーガニックサーチPV";
 
-                    foreach (var tmp in this.CombineData.CombineDataList.Items)
+                    foreach (var tmp in this.Articles.CombineAnalyticsItems.Items)
                     {
                         col = 1;
                         row++;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Id;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Title;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.ContentLength2;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.TitleLength;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageViews;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.UniquePageviews;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.AvgTimeOnPage;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.Entrances;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.Exits;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.ExitRate;
-                        //book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Analytics.PageValue;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.LengthCheck;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.KeywordCheck;
-                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.WordPress.Link;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Id;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Title;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.ContentLength;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.ContentLength2;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.TitleLength;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Link;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.TwitterPageViews;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.OrganicPageViews;
                     }
 
                     book.SaveAs(dialog.FileName);

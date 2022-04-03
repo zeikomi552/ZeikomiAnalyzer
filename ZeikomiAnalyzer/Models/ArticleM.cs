@@ -213,15 +213,63 @@ namespace ZeikomiAnalyzer.Models
 
 			}
 		}
-        #endregion
+		#endregion
 
+		#region ツイッターからのPV数[TwitterPageViews]プロパティ
+		/// <summary>
+		/// ツイッターからのPV数[TwitterPageViews]プロパティ用変数
+		/// </summary>
+		int _TwitterPageViews = 0;
+		/// <summary>
+		/// ツイッターからのPV数[TwitterPageViews]プロパティ
+		/// </summary>
+		public int TwitterPageViews
+		{
+			get
+			{
+				return _TwitterPageViews;
+			}
+			set
+			{
+				if (!_TwitterPageViews.Equals(value))
+				{
+					_TwitterPageViews = value;
+					NotifyPropertyChanged("TwitterPageViews");
+				}
+			}
+		}
+		#endregion
 
+		#region オーガニック検索からのPV数[OrganicPageViews]プロパティ
+		/// <summary>
+		/// オーガニック検索からのPV数[OrganicPageViews]プロパティ用変数
+		/// </summary>
+		int _OrganicPageViews = 0;
+		/// <summary>
+		/// オーガニック検索からのPV数[OrganicPageViews]プロパティ
+		/// </summary>
+		public int OrganicPageViews
+		{
+			get
+			{
+				return _OrganicPageViews;
+			}
+			set
+			{
+				if (!_OrganicPageViews.Equals(value))
+				{
+					_OrganicPageViews = value;
+					NotifyPropertyChanged("OrganicPageViews");
+				}
+			}
+		}
+		#endregion
 
-        #region 記事の長さ
-        /// <summary>
-        /// 記事の長さ
-        /// </summary>
-        public int ContentLength
+		#region 記事の長さ
+		/// <summary>
+		/// 記事の長さ
+		/// </summary>
+		public int ContentLength
         {
 			get
 			{

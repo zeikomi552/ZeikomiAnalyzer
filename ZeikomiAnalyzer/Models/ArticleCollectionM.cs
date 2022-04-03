@@ -112,6 +112,33 @@ namespace ZeikomiAnalyzer.Models
 		}
 		#endregion
 
+		#region Google Analyticsデータとブログ記事情報をくっつけたもの[CombineAnalyticsItems]プロパティ
+		/// <summary>
+		/// Google Analyticsデータとブログ記事情報をくっつけたもの[CombineAnalyticsItems]プロパティ用変数
+		/// </summary>
+		ModelList<ArticleM> _CombineAnalyticsItems = new ModelList<ArticleM>();
+		/// <summary>
+		/// Google Analyticsデータとブログ記事情報をくっつけたもの[CombineAnalyticsItems]プロパティ
+		/// </summary>
+		public ModelList<ArticleM> CombineAnalyticsItems
+		{
+			get
+			{
+				return _CombineAnalyticsItems;
+			}
+			set
+			{
+				if (_CombineAnalyticsItems == null || !_CombineAnalyticsItems.Equals(value))
+				{
+					_CombineAnalyticsItems = value;
+					NotifyPropertyChanged("CombineAnalyticsItems");
+				}
+			}
+		}
+		#endregion
+
+
+
 		#region アナリティクスデータの追加処理
 		/// <summary>
 		/// アナリティクスデータの追加処理
@@ -181,6 +208,104 @@ namespace ZeikomiAnalyzer.Models
 				);
 		}
 		#endregion
+
+		#region アクセス数ゼロの記事の追加処理
+		/// <summary>
+		/// アクセス数ゼロの記事の追加処理
+		/// </summary>
+		/// <param name="url">URL</param>
+		/// <param name="title">タイトル</param>
+		/// <param name="content">コンテンツ</param>
+		/// <param name="type">タイプ post or page</param>
+		/// <param name="organic_pv">ページビュー数</param>
+		/// <param name="twitter_page_views">ページビュー数</param>
+		/// <param name="categories">カテゴリ</param>
+		public void AddArticleAnalytics(string url, string title, string content, string type, int organic_pv, int twitter_page_views, int[] categories = null)
+		{
+			this.CombineAnalyticsItems.Items.Add(
+				new ArticleM()
+				{
+					Title = title,
+					Contents = content,
+					Link = url,
+					Type = type,
+					Categories = categories,
+					OrganicPageViews = organic_pv,
+					TwitterPageViews = twitter_page_views,
+				}
+				);
+		}
+		#endregion
+		#region ニート記事の抽出処理
+		/// <summary>
+		/// ニート記事の抽出処理
+		/// </summary>
+		public void OutputNeet()
+        {
+			// ニート記事一覧の初期化
+			this.ZeroTitles.Items.Clear();
+
+			foreach (var article in this.Pages.Items)
+			{
+				string slug = "/" + article.Slug + "/";
+
+				// 一部一致のものを探す //amp=等の対策
+				if ((from x in this.Analytics.Items
+					 where x.Page.Contains(slug)
+					 select x).Any())
+				{
+					continue;
+				}
+
+				this.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "page");
+			}
+
+			foreach (var article in this.Posts.Items)
+			{
+				string slug = "/" + article.Slug + "/";
+
+				// 一部一致のものを探す //amp=等の対策
+				if ((from x in this.Analytics.Items
+					 where x.Page.Contains(slug)
+					 select x).Any())
+				{
+					continue;
+				}
+
+				this.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", article.Categories);
+			}
+
+		}
+		#endregion
+
+		public void CombineArticleAndAnalytics()
+		{
+
+			foreach (var article in this.Posts.Items)
+			{
+				string slug = "/" + article.Slug + "/";
+
+				var tmp = (from x in this.Analytics.Items
+						   where x.Page.Contains(slug)
+						   select x);
+
+				// 一部一致のものを探す //amp=等の対策
+				if (tmp.Any())
+				{
+					var t_pv = (from x in tmp
+						where x.DefaultChannelGroup.Equals("Social") && x.SocialNetwork.Equals("Twitter")
+						select x).Sum(x=>x.PageViews);
+
+					var o_pv = (from x in tmp
+							  where x.DefaultChannelGroup.Equals("Organic Search")
+							  select x).Sum(x => x.PageViews);
+
+					this.AddArticleAnalytics(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", o_pv, t_pv, article.Categories);
+				}
+
+			}
+
+		}
 
 		#region クリア処理
 		/// <summary>

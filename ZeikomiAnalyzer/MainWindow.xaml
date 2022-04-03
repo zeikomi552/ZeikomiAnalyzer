@@ -395,8 +395,8 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <DataGrid Grid.Row="1" IsReadOnly="True" AutoGenerateColumns="False"
-                                              ItemsSource="{Binding CombineData.CombineDataList.Items}"
-                                              SelectedItem="{Binding CombineData.CombineDataList.SelectedItem}" Margin="5,5,5,5" Grid.RowSpan="2">
+                                              ItemsSource="{Binding Articles.CombineAnalyticsItems.Items}"
+                                              SelectedItem="{Binding Articles.CombineAnalyticsItems.SelectedItem}" Margin="5,5,5,5" Grid.RowSpan="2">
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="MouseDoubleClick">
                                                     <b:CallMethodAction MethodName="RowDoubleClick" TargetObject="{Binding}"/>
@@ -407,14 +407,14 @@
                                             </b:Interaction.Triggers>
 
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="ID" Binding="{Binding WordPress.Id}"/>
-                                                <DataGridTextColumn Header="タイトル" Binding="{Binding WordPress.Title}"/>
-                                                <DataGridTextColumn Header="タイトル文字数チェック" Binding="{Binding WordPress.LengthCheck, Converter={StaticResource boolToMaruBatsuConverter}, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="タイトルキーワードチェック" Binding="{Binding WordPress.KeywordCheck, Converter={StaticResource boolToMaruBatsuConverter}, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="文字数" Binding="{Binding WordPress.ContentLength, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding WordPress.ContentLength2, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="タイトル文字数" Binding="{Binding WordPress.TitleLength, Mode=OneWay}"/>
-                                                <DataGridTextColumn Header="URL" Binding="{Binding WordPress.Link}"/>
+                                                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                                <DataGridTextColumn Header="タイトル" Binding="{Binding Title}"/>
+                                                <DataGridTextColumn Header="文字数" Binding="{Binding ContentLength, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="文字数(タグ除外)" Binding="{Binding ContentLength2, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="タイトル文字数" Binding="{Binding TitleLength, Mode=OneWay}"/>
+                                                <DataGridTextColumn Header="URL" Binding="{Binding Link}"/>
+                                                <DataGridTextColumn Header="ツイッターPV" Binding="{Binding TwitterPageViews}"/>
+                                                <DataGridTextColumn Header="オーガニックサーチPC" Binding="{Binding OrganicPageViews}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                     </Grid>
@@ -422,7 +422,7 @@
                                 <GroupBox Grid.Column="1" Header="記事内容">
                                     <TextBox Margin="5" AcceptsReturn="True" FontSize="20"
                                                  VerticalScrollBarVisibility="Auto" IsReadOnly="True"
-                                                 Text="{Binding CombineData.CombineDataList.SelectedItem.WordPress.ContentsEx, Mode=OneWay}" Cursor="IBeam"/>
+                                                 Text="{Binding Articles.CombineAnalyticsItems.SelectedItem.ContentsEx, Mode=OneWay}" Cursor="IBeam"/>
                                 </GroupBox>
 
 
