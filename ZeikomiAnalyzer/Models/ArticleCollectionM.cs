@@ -213,6 +213,7 @@ namespace ZeikomiAnalyzer.Models
 		/// <summary>
 		/// アクセス数ゼロの記事の追加処理
 		/// </summary>
+		/// <param name="id">記事ID</param>
 		/// <param name="url">URL</param>
 		/// <param name="title">タイトル</param>
 		/// <param name="content">コンテンツ</param>
@@ -220,11 +221,12 @@ namespace ZeikomiAnalyzer.Models
 		/// <param name="organic_pv">ページビュー数</param>
 		/// <param name="twitter_page_views">ページビュー数</param>
 		/// <param name="categories">カテゴリ</param>
-		public void AddArticleAnalytics(string url, string title, string content, string type, int organic_pv, int twitter_page_views, int[] categories = null)
+		public void AddArticleAnalytics(int id, string url, string title, string content, string type, int organic_pv, int twitter_page_views, int[] categories = null)
 		{
 			this.CombineAnalyticsItems.Items.Add(
 				new ArticleM()
 				{
+					Id = id,
 					Title = title,
 					Contents = content,
 					Link = url,
@@ -300,7 +302,11 @@ namespace ZeikomiAnalyzer.Models
 							  where x.DefaultChannelGroup.Equals("Organic Search")
 							  select x).Sum(x => x.PageViews);
 
-					this.AddArticleAnalytics(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", o_pv, t_pv, article.Categories);
+					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", o_pv, t_pv, article.Categories);
+				}
+				else
+                {
+					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", 0, 0, article.Categories);
 				}
 
 			}

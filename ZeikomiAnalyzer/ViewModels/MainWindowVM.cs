@@ -659,6 +659,7 @@ namespace ZeikomiAnalyzer.ViewModels
                     int row = 1, col = 1;
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ID";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "カテゴリ";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "文字数(タグ除外)";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "タイトル文字数";
@@ -672,6 +673,7 @@ namespace ZeikomiAnalyzer.ViewModels
                         row++;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Id;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Title;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.CategoriesText;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.ContentLength;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.ContentLength2;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.TitleLength;
