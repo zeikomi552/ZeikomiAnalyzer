@@ -117,7 +117,7 @@ namespace ZeikomiAnalyzer.Models
 		/// アナリティクスデータの追加処理
 		/// </summary>
 		/// <param name="report_rows">行データ</param>
-		public void Add(IEnumerable<ReportRow> report_rows)
+		public void AddAnalytics(IEnumerable<ReportRow> report_rows)
 		{
 			foreach (var row in report_rows)
 			{

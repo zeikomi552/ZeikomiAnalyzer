@@ -376,6 +376,7 @@ namespace ZeikomiAnalyzer.ViewModels
                            this.Articles.Analytics.Items.Clear();
                        }));
 
+                    // Analyticsデータの取得処理
                     var results = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
 
                     ArticleCollectionM tmp = new ArticleCollectionM();
@@ -383,16 +384,17 @@ namespace ZeikomiAnalyzer.ViewModels
                     {
                         var report = result.Reports.First();
 
-                        tmp.Add(report.Data.Rows);
+                        // Google Analyticsデータの登録
+                        tmp.AddAnalytics(report.Data.Rows);
                     }
 
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                        new Action(() =>
                        {
-                           this.Articles = tmp;
+                           // Analyticsデータの入れ替え
+                           this.Articles.Analytics = tmp.Analytics;
                            this.IsExecute = false;
                        }));
-
                 });
 
             }
