@@ -19,6 +19,7 @@ using Google.Apis.AnalyticsReporting.v4;
 using Google.Apis.AnalyticsReporting.v4.Data;
 using Google.Apis.Auth.OAuth2;
 using Twapi.Twitter;
+using ZeikomiAnalyzer.Common.Utilities;
 
 namespace ZeikomiAnalyzer.ViewModels
 {
@@ -225,6 +226,31 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region ツイートした内容にPV数を付与したもの[TweetPVList]プロパティ
+        /// <summary>
+        /// ツイートした内容にPV数を付与したもの[TweetPVList]プロパティ用変数
+        /// </summary>
+        ModelList<StatusEx> _TweetPVList = new ModelList<StatusEx>();
+        /// <summary>
+        /// ツイートした内容にPV数を付与したもの[TweetPVList]プロパティ
+        /// </summary>
+        public ModelList<StatusEx> TweetPVList
+        {
+            get
+            {
+                return _TweetPVList;
+            }
+            set
+            {
+                if (_TweetPVList == null || !_TweetPVList.Equals(value))
+                {
+                    _TweetPVList = value;
+                    NotifyPropertyChanged("TweetPVList");
+                }
+            }
+        }
+        #endregion
+
 
 
 
@@ -251,7 +277,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 }
 
                 this.AnalyticsSearchCondition.ViewId = this.Config.ViewId;
-                
+
             }
             catch (Exception e)
             {
@@ -339,17 +365,35 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-                // 記事の削除
-                this.Articles.Analytics.Items.Clear();
-
-                var results = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
-
-                foreach(var result in results)
+                Task.Run(() =>
                 {
-                    var report = result.Reports.First();
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
+                           this.IsExecute = true;
 
-                    this.Articles.Add(report.Data.Rows);
-                }
+                           // 記事の削除
+                           this.Articles.Analytics.Items.Clear();
+                       }));
+
+                    var results = this.AnalyticsSearchCondition.GetAnalytics(this.Config.GoogleAnalyticsPrivateKey);
+
+                    ArticleCollectionM tmp = new ArticleCollectionM();
+                    foreach (var result in results)
+                    {
+                        var report = result.Reports.First();
+
+                        tmp.Add(report.Data.Rows);
+                    }
+
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
+                           this.Articles = tmp;
+                           this.IsExecute = false;
+                       }));
+
+                });
 
             }
             catch (Exception e)
@@ -426,7 +470,7 @@ namespace ZeikomiAnalyzer.ViewModels
                         continue;
                     }
 
-                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;","―"), article.Content.Rendered, "post", article.Categories);
+                    this.Articles.AddNeet(article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", article.Categories);
                 }
             }
             catch (Exception e)
@@ -516,9 +560,9 @@ namespace ZeikomiAnalyzer.ViewModels
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                        new Action(() =>
                        {
-                            // データのセット
-                            this.AnalyticsList = tmp;
-                            this.IsExecute = false;
+                           // データのセット
+                           this.AnalyticsList = tmp;
+                           this.IsExecute = false;
                        }));
 
                 }
@@ -542,36 +586,36 @@ namespace ZeikomiAnalyzer.ViewModels
                 // データのクリア
                 //this.CombineData.Clear();
 
-            //    // 記事数分回す
-            //    foreach (var article in this.Articles.Articles.Items)
-            //    {
-            //        string link = article.Link;                 // リンク情報の取得
-            //        string url = AdjustURL(this.Config.Url);    // 末尾の/を取り除くいてURLを調整する
+                //    // 記事数分回す
+                //    foreach (var article in this.Articles.Articles.Items)
+                //    {
+                //        string link = article.Link;                 // リンク情報の取得
+                //        string url = AdjustURL(this.Config.Url);    // 末尾の/を取り除くいてURLを調整する
 
-            //        // WordPressの記事とアナリティクスデータの各URLが一致するものを取り出す
-            //        var tmp = (from x in this.AnalyticsList.GoogleAnalyticsItems.Items
-            //                   where (url + x.Page).Equals(link)
-            //                   select x).FirstOrDefault();
+                //        // WordPressの記事とアナリティクスデータの各URLが一致するものを取り出す
+                //        var tmp = (from x in this.AnalyticsList.GoogleAnalyticsItems.Items
+                //                   where (url + x.Page).Equals(link)
+                //                   select x).FirstOrDefault();
 
-            //        // 一致する場合
-            //        if (tmp != null)
-            //        {
-            //            // ワードプレス記事とアナリティクスデータを結合して登録
-            //            cmb.Add(article, tmp);
-            //        }
-            //        // 一致しない場合
-            //        else
-            //        {
-            //            // ワードプレス記事を登録する
-            //            // アナリティクスデータはないので全て0で登録
-            //            cmb.Add(article, new GoogleAnalyticsM());
-            //        }
-            //    }
+                //        // 一致する場合
+                //        if (tmp != null)
+                //        {
+                //            // ワードプレス記事とアナリティクスデータを結合して登録
+                //            cmb.Add(article, tmp);
+                //        }
+                //        // 一致しない場合
+                //        else
+                //        {
+                //            // ワードプレス記事を登録する
+                //            // アナリティクスデータはないので全て0で登録
+                //            cmb.Add(article, new GoogleAnalyticsM());
+                //        }
+                //    }
 
-            //    this.CombineData.CombineDataList.Items 
-            //        = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
-            //                                                                                                                    orderby x.Analytics.PageView, x.WordPress.Id
-            //                                                                                                                    select x).ToList());
+                //    this.CombineData.CombineDataList.Items 
+                //        = new System.Collections.ObjectModel.ObservableCollection<CombineDataM>((from x in cmb.CombineDataList.Items
+                //                                                                                                                    orderby x.Analytics.PageView, x.WordPress.Id
+                //                                                                                                                    select x).ToList());
             }
             catch (Exception e)
             {
@@ -619,9 +663,10 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-                var tmp = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
+                var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
 
-                this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(tmp);
+
+                this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
             }
             catch (Exception e)
             {
@@ -653,7 +698,9 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
-
+        /// <summary>
+        /// Excelファイルの保存処理
+        /// </summary>
         public void SaveExcel()
         {
             try
@@ -708,6 +755,7 @@ namespace ZeikomiAnalyzer.ViewModels
                     }
 
                     book.SaveAs(dialog.FileName);
+                    ShowMessage.ShowNoticeOK("ファイルを保存しました。", "通知");
 
                 }
             }
@@ -777,6 +825,8 @@ namespace ZeikomiAnalyzer.ViewModels
                     }
 
                     book.SaveAs(dialog.FileName);
+                    ShowMessage.ShowNoticeOK("ファイルを保存しました。", "通知");
+
 
                 }
             }
@@ -786,11 +836,14 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
 
+        /// <summary>
+        /// タイトルのセット
+        /// </summary>
         public void SetTitle()
         {
             try
             {
-                if( this.CombineData.CombineDataList.SelectedItem != null)
+                if (this.CombineData.CombineDataList.SelectedItem != null)
                 {
                     this.ETitle.Title = this.CombineData.CombineDataList.SelectedItem.WordPress.Title;
                 }
@@ -801,7 +854,7 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
 
-
+        #region 秘密鍵のファイルパスを開く
         /// <summary>
         /// 秘密鍵のファイルパスを開く
         /// </summary>
@@ -819,7 +872,162 @@ namespace ZeikomiAnalyzer.ViewModels
                 this.Config.GoogleAnalyticsPrivateKey = dialog.FileName;
             }
         }
+        #endregion
+
+        #region ツイート内容のPV数を計算
+        /// <summary>
+        /// ツイート内容のPV数を計算
+        /// </summary>
+        public void CalcTweetPV()
+        {
+
+            try
+            {
+                List<StatusEx> list = new List<StatusEx>();
+                foreach (var tweet in this.TweetTimeline.Items)
+                {
+                    // nullチェック URLが登録されているもののみ抽出
+                    if (tweet != null && tweet.Entities != null && tweet.Entities.Urls.Count() > 0)
+                    {
+                        var tmp = new StatusEx();
+                        tmp.CreatedAt = tweet.CreatedAt;
+                        tmp.Id = tweet.Id;
+                        tmp.Text = tweet.Text;
+                        tmp.FavoriteCount = tweet.FavoriteCount;
+                        tmp.RetweetCount = tweet.RetweetCount;
+                        tmp.Entities = tweet.Entities;
+
+                        var analytics = (from x in this.Articles.Analytics.Items
+                                         // Twitterのみ抽出
+                                         where x.SocialNetwork.Equals("Twitter")
+                                            // Google Analytics結果のランディングページとPV数を数えているページが一致しているもののみ抽出
+                                            && x.LandingPage.Equals(x.Page)
+                                            // TwitterのURLとGoogleAnalyticsのURLが合致しているもののみ抽出
+                                            && x.LandingPage.Equals(tweet.Entities.Urls.ElementAt(0).ExpandedUrl.Replace(PathManager.TrimLastText(this.Config.Url,"/"), ""))
+                                            // Tweet日とGoogle Analyticsの日が一致するものを抽出
+                                            && x.TargetDate.Equals(tmp.CreatedAt.LocalDateTime.Date)
+                                         select x).FirstOrDefault();
+
+                        // 合致するものが見つかった
+                        if (analytics != null)
+                        {
+                            // 追加
+                            tmp.PageView = analytics.PageViews;
+                        }
+
+                        list.Add(tmp);
+                    }
+                }
+                this.TweetPVList.Items = new System.Collections.ObjectModel.ObservableCollection<StatusEx>(list);
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// TweetPV用のExcelファイルの保存処理
+        /// </summary>
+        public void SaveExcelTweetPV()
+        {
+            try
+            {
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "Excelファイル (*.xlsx)|*.xlsx";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    XLWorkbook book = new XLWorkbook();
+                    book.Worksheets.Add("出力");
+                    int row = 1, col = 1;
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ID";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイート日時";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイート内容";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "いいね数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "リツイート数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "PV数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL";
+
+                    foreach (var tmp in this.TweetPVList.Items)
+                    {
+                        col = 1;
+                        row++;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Id;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.CreatedAt.LocalDateTime;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Text;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.FavoriteCount;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetCount;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.PageView;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Entities != null && tmp.Entities.Urls.Any() ? tmp.Entities.Urls.ElementAt(0).ExpandedUrl : string.Empty;
+                    }
+
+                    book.SaveAs(dialog.FileName);
+                    ShowMessage.ShowNoticeOK("ファイルを保存しました。", "通知");
 
 
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+        /// <summary>
+        /// TweetPV用のExcelファイルの保存処理
+        /// </summary>
+        public void SaveExcelGoogleAnalytics()
+        {
+            try
+            {
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "Excelファイル (*.xlsx)|*.xlsx";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    XLWorkbook book = new XLWorkbook();
+                    book.Worksheets.Add("出力");
+                    int row = 1, col = 1;
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "対象日";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "グループ";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ソーシャル";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページ";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページタイトル";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ランディングページ";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ページビュー数";
+
+                    foreach (var tmp in Articles.Analytics.Items)
+                    {
+                        col = 1;
+                        row++;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.TargetDate;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.DefaultChannelGroup;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.SocialNetwork;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Page;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.PageTitle;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.LandingPage;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.PageViews;
+                    }
+
+                    book.SaveAs(dialog.FileName);
+                    ShowMessage.ShowNoticeOK("ファイルを保存しました。", "通知");
+
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
     }
 }

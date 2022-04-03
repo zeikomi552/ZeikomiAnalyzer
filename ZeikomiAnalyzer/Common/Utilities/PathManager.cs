@@ -53,6 +53,20 @@ namespace ZeikomiAnalyzer.Common.Utilities
         }
         #endregion
 
+        public static string TrimLastText(string text, string lasttext)
+        {
+            if (text.Length >= lasttext.Length)
+            {
+                var last = text.Substring(text.Length - lasttext.Length);
+
+                if(last.Equals(lasttext))
+                {
+                    return text.Substring(0, text.Length - lasttext.Length);
+                }
+            }
+            return text;
+        }
+
     }
 
 }

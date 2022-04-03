@@ -281,7 +281,7 @@ namespace Twapi.Twitter
 
                 if (tmp != null)
                 {
-                    status = token.Statuses.UserTimeline(q => screen_name, count => 200, max_id => tmp.Id-1);
+                    status = token.Statuses.UserTimeline(q => screen_name, count => 200, max_id => tmp.Id - 1);
 
                     ret.AddRange(status.ToList<Status>());
                 }
