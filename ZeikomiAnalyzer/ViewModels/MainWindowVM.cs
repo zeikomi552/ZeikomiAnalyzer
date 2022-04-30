@@ -20,6 +20,7 @@ using Google.Apis.AnalyticsReporting.v4.Data;
 using Google.Apis.Auth.OAuth2;
 using Twapi.Twitter;
 using ZeikomiAnalyzer.Common.Utilities;
+using CoreTweet;
 
 namespace ZeikomiAnalyzer.ViewModels
 {
@@ -226,6 +227,33 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region ツイッター検索結果[TwitterSearchResult]プロパティ
+        /// <summary>
+        /// ツイッター検索結果[TwitterSearchResult]プロパティ用変数
+        /// </summary>
+        ModelList<CoreTweet.Status> _TwitterSearchResult = new ModelList<CoreTweet.Status>();
+        /// <summary>
+        /// ツイッター検索結果[TwitterSearchResult]プロパティ
+        /// </summary>
+        public ModelList<CoreTweet.Status> TwitterSearchResult
+        {
+            get
+            {
+                return _TwitterSearchResult;
+            }
+            set
+            {
+                if (_TwitterSearchResult == null || !_TwitterSearchResult.Equals(value))
+                {
+                    _TwitterSearchResult = value;
+                    NotifyPropertyChanged("TwitterSearchResult");
+                }
+            }
+        }
+        #endregion
+
+
+
         #region ツイートした内容にPV数を付与したもの[TweetPVList]プロパティ
         /// <summary>
         /// ツイートした内容にPV数を付与したもの[TweetPVList]プロパティ用変数
@@ -246,6 +274,31 @@ namespace ZeikomiAnalyzer.ViewModels
                 {
                     _TweetPVList = value;
                     NotifyPropertyChanged("TweetPVList");
+                }
+            }
+        }
+        #endregion
+
+        #region ツイッター検索のキーワード[TwitterKeyWord]プロパティ
+        /// <summary>
+        /// ツイッター検索のキーワード[TwitterKeyWord]プロパティ用変数
+        /// </summary>
+        string _TwitterKeyWord = string.Empty;
+        /// <summary>
+        /// ツイッター検索のキーワード[TwitterKeyWord]プロパティ
+        /// </summary>
+        public string TwitterKeyWord
+        {
+            get
+            {
+                return _TwitterKeyWord;
+            }
+            set
+            {
+                if (_TwitterKeyWord == null || !_TwitterKeyWord.Equals(value))
+                {
+                    _TwitterKeyWord = value;
+                    NotifyPropertyChanged("TwitterKeyWord");
                 }
             }
         }
@@ -597,17 +650,17 @@ namespace ZeikomiAnalyzer.ViewModels
 
         #region ツイートの取得処理
         /// <summary>
-        /// ツイートの取得処理
+        /// ツイートの取得処理(自分のツイートのタイムライン取得)
         /// </summary>
         public void GetTweet()
         {
             try
             {
-                GetTweet2();
-                //var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
-
-
-                //this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                Task.Run(() =>
+                {
+                    var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
+                    this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                });
             }
             catch (Exception e)
             {
@@ -616,20 +669,27 @@ namespace ZeikomiAnalyzer.ViewModels
         }
         #endregion
 
+        #region キーワードを指定してツイートを取得
+        /// <summary>
+        /// キーワードを指定してツイートを取得
+        /// </summary>
         public void GetTweet2()
         {
             try
             {
-                var timeline = TwitterAPI.GetTweet("Python");
-
-
-                this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                Task.Run(() =>
+                {
+                    SearchResult result = null;
+                    var timeline = TwitterAPI.GetKeywordTweet(this.TwitterKeyWord, ref result);
+                    this.TwitterSearchResult.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                });
             }
             catch (Exception e)
             {
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
+        #endregion
 
 
         #region 行のダブルクリック処理

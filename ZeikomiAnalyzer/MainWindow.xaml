@@ -183,15 +183,7 @@
                         <CheckBox Width="25" Height="25" Style="{DynamicResource MaterialDesignActionCheckBox}" IsChecked="False" x:Name="toggleButton6" Margin="5" Content="表示" Cursor="Hand" FontSize="10"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <Button Margin="5" Width="100" Content="ツイート取得" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}" Cursor="Hand">
-                            <b:Interaction.Triggers>
-                                <b:EventTrigger EventName="Click">
-                                    <b:CallMethodAction TargetObject="{Binding}" MethodName="GetTweet"/>
-                                </b:EventTrigger>
-                            </b:Interaction.Triggers>
-                        </Button>
-                    </StackPanel>
+
                 </StackPanel>
             </GroupBox>
         </Grid>
@@ -289,6 +281,13 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                                 <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <Button Margin="5" Width="100" Content="ツイート取得" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}" Cursor="Hand">
+                                        <b:Interaction.Triggers>
+                                            <b:EventTrigger EventName="Click">
+                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="GetTweet"/>
+                                            </b:EventTrigger>
+                                        </b:Interaction.Triggers>
+                                    </Button>
                                     <Button Content="Excel出力" Width="100" Margin="5">
                                         <b:Interaction.Triggers>
                                             <b:EventTrigger EventName="Click">
@@ -329,6 +328,60 @@
                                         <b:Interaction.Triggers>
                                             <b:EventTrigger EventName="Click">
                                                 <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelTweetPV"/>
+                                            </b:EventTrigger>
+                                        </b:Interaction.Triggers>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="ツイッター検索">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding TwitterSearchResult.Items}"
+                                  SelectedItem="{Binding TwitterSearchResult.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="ツイート日時" Binding="{Binding CreatedAt.LocalDateTime, StringFormat=yyyy/MM/dd(ddd)}"/>
+                                        <DataGridTextColumn Width="200" Header="ツイート内容" Binding="{Binding Text}"/>
+                                        <DataGridTextColumn Header="いいね数" Binding="{Binding FavoriteCount}"/>
+                                        <DataGridTextColumn Header="リツイート数" Binding="{Binding RetweetCount}"/>
+                                        <DataGridTextColumn Header="本家(いいね)" Binding="{Binding RetweetedStatus.FavoriteCount}"/>
+                                        <DataGridTextColumn Header="本家(リツイートカウント)" Binding="{Binding RetweetedStatus.RetweetCount}"/>
+                                        <DataGridTextColumn Header="本家(ScreenName)" Binding="{Binding RetweetedStatus.User.ScreenName}"/>
+                                        <DataGridTextColumn Header="本家(フォロー数)" Binding="{Binding RetweetedStatus.User.FriendsCount}"/>
+                                        <DataGridTextColumn Header="本家(フォロワー数)" Binding="{Binding RetweetedStatus.User.FollowersCount}"/>
+                                        <DataGridTextColumn Width="200" Header="URL" Binding="{Binding Converter={StaticResource CoreTweetStatusToUrlstringConverter}, Mode=OneWay}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center" Text="検索キーワード"/>
+                                        <TextBlock VerticalAlignment="Center" Text=":"/>
+                                        <TextBox Width="100" Text="{Binding TwitterKeyWord}"/>
+                                    </StackPanel>
+                                    <Button Margin="5" Width="100" Content="ツイート取得" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}" Cursor="Hand">
+                                        <b:Interaction.Triggers>
+                                            <b:EventTrigger EventName="Click">
+                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="GetTweet2"/>
+                                            </b:EventTrigger>
+                                        </b:Interaction.Triggers>
+                                    </Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center" Text="残り"/>
+                                        <TextBlock VerticalAlignment="Center" Text=":"/>
+                                        <TextBlock Width="100" VerticalAlignment="Center" Text=""/>
+                                        <TextBlock VerticalAlignment="Center" Text="更新"/>
+                                        <TextBlock VerticalAlignment="Center" Text=":"/>
+                                        <TextBlock Width="100" VerticalAlignment="Center" Text=""/>
+                                    </StackPanel>
+                                    <Button Content="Excel出力" Width="100" Margin="5">
+                                        <b:Interaction.Triggers>
+                                            <b:EventTrigger EventName="Click">
+                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelTweetContent"/>
                                             </b:EventTrigger>
                                         </b:Interaction.Triggers>
                                     </Button>

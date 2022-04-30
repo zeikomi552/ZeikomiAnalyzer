@@ -295,7 +295,13 @@ namespace Twapi.Twitter
         }
         #endregion
 
-        public static List<Status> GetTweet(string query)
+        /// <summary>
+        /// キーワードを指定してツイートを取得する
+        /// </summary>
+        /// <param name="query">検索キーワード</param>
+        /// <param name="result">結果（RateLimit取得用）</param>
+        /// <returns>取得結果</returns>
+        public static List<Status> GetKeywordTweet(string query, ref SearchResult result)
         {
             List<Status> ret = new List<Status>();
             // トークンの作成
@@ -304,17 +310,19 @@ namespace Twapi.Twitter
             // 検索
             var tweet = token.Search.Tweets(q=> query, count=>100, lang => "ja");
 
+            result = tweet;
+
             if (tweet != null)
                 ret.AddRange(tweet.ToList<Status>());
 
             while (tweet.Count > 0)
             {
-                System.Threading.Thread.Sleep(1000);
                 var tmp = tweet.Last();
 
                 if (tmp != null)
                 {
                     tweet = token.Search.Tweets(q => query, count => 100, max_id => tmp.Id - 1, lang=>"ja");
+                    result = tweet;
                     ret.AddRange(tweet.ToList<Status>());
                 }
                 else
