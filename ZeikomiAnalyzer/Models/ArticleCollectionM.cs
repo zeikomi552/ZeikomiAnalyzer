@@ -221,7 +221,7 @@ namespace ZeikomiAnalyzer.Models
 		/// <param name="organic_pv">ページビュー数</param>
 		/// <param name="twitter_page_views">ページビュー数</param>
 		/// <param name="categories">カテゴリ</param>
-		public void AddArticleAnalytics(int id, string url, string title, string content, string type, int organic_pv, int twitter_page_views, int[] categories = null)
+		public void AddArticleAnalytics(int id, string url, string title, string content, string type, int organic_pv, int twitter_page_views, int direct_pv, int referral_pv, int[] categories = null)
 		{
 			this.CombineAnalyticsItems.Items.Add(
 				new ArticleM()
@@ -234,6 +234,8 @@ namespace ZeikomiAnalyzer.Models
 					Categories = categories,
 					OrganicPageViews = organic_pv,
 					TwitterPageViews = twitter_page_views,
+					DirectPageViews = direct_pv,
+					ReferralPageViews = referral_pv
 				}
 				);
 		}
@@ -302,11 +304,20 @@ namespace ZeikomiAnalyzer.Models
 							  where x.DefaultChannelGroup.Equals("Organic Search")
 							  select x).Sum(x => x.PageViews);
 
-					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", o_pv, t_pv, article.Categories);
+					var r_pv = (from x in tmp
+								where x.DefaultChannelGroup.Equals("Referral")
+								select x).Sum(x => x.PageViews);
+
+					var d_pv = (from x in tmp
+								where x.DefaultChannelGroup.Equals("Direct")
+								select x).Sum(x => x.PageViews);
+
+
+					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", o_pv, t_pv, d_pv, r_pv, article.Categories);
 				}
 				else
                 {
-					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", 0, 0, article.Categories);
+					this.AddArticleAnalytics(article.Id, article.Link, article.Title.Rendered.Replace("&#8211;", "―"), article.Content.Rendered, "post", 0, 0, 0, 0, article.Categories);
 				}
 
 			}

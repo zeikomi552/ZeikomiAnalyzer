@@ -295,6 +295,42 @@ namespace Twapi.Twitter
         }
         #endregion
 
+        public static List<Status> GetTweet(string query)
+        {
+            List<Status> ret = new List<Status>();
+            // トークンの作成
+            var token = CreateToken();
+
+            // 検索
+            var tweet = token.Search.Tweets(q=> query, count=>100, lang => "ja");
+
+            if (tweet != null)
+                ret.AddRange(tweet.ToList<Status>());
+
+            while (tweet.Count > 0)
+            {
+                System.Threading.Thread.Sleep(1000);
+                var tmp = tweet.Last();
+
+                if (tmp != null)
+                {
+                    tweet = token.Search.Tweets(q => query, count => 100, max_id => tmp.Id - 1, lang=>"ja");
+                    ret.AddRange(tweet.ToList<Status>());
+                }
+                else
+                {
+                    break;
+                }
+
+                if (tweet.RateLimit.Remaining <= 0)
+                {
+                    break;
+                }
+            }
+            return ret;
+
+        }
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -603,7 +603,24 @@ namespace ZeikomiAnalyzer.ViewModels
         {
             try
             {
-                var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
+                GetTweet2();
+                //var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
+
+
+                //this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+        #endregion
+
+        public void GetTweet2()
+        {
+            try
+            {
+                var timeline = TwitterAPI.GetTweet("Python");
 
 
                 this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
@@ -613,7 +630,7 @@ namespace ZeikomiAnalyzer.ViewModels
                 ShowMessage.ShowErrorOK(e.Message, "Error");
             }
         }
-        #endregion
+
 
         #region 行のダブルクリック処理
         /// <summary>
@@ -666,6 +683,8 @@ namespace ZeikomiAnalyzer.ViewModels
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "URL";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイッターPV";
                     book.Worksheets.ElementAt(0).Cell(row, col++).Value = "オーガニックサーチPV";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ダイレクトPV";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "リファラーPV";
 
                     foreach (var tmp in this.Articles.CombineAnalyticsItems.Items)
                     {
@@ -680,6 +699,8 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Link;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.TwitterPageViews;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.OrganicPageViews;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.DirectPageViews;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.ReferralPageViews;
                     }
 
                     book.SaveAs(dialog.FileName);
@@ -945,6 +966,73 @@ namespace ZeikomiAnalyzer.ViewModels
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.PageTitle;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.LandingPage;
                         book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.PageViews;
+                    }
+
+                    book.SaveAs(dialog.FileName);
+                    ShowMessage.ShowNoticeOK("ファイルを保存しました。", "通知");
+
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessage.ShowErrorOK(e.Message, "Error");
+            }
+        }
+
+
+        /// <summary>
+        /// TweetPV用のExcelファイルの保存処理
+        /// </summary>
+        public void SaveExcelTweetContent()
+        {
+            try
+            {
+                // ダイアログのインスタンスを生成
+                var dialog = new SaveFileDialog();
+
+                // ファイルの種類を設定
+                dialog.Filter = "Excelファイル (*.xlsx)|*.xlsx";
+
+                // ダイアログを表示する
+                if (dialog.ShowDialog() == true)
+                {
+                    XLWorkbook book = new XLWorkbook();
+                    book.Worksheets.Add("出力");
+                    int row = 1, col = 1;
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ID";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "スクリーン名";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "フォロー数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "フォロワー数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイート日時";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "ツイート内容";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "いいね数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "リツイート数";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "本家(いいね)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "本家(リツイートカウント)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "本家(スクリーン名)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "本家(フォロー数)";
+                    book.Worksheets.ElementAt(0).Cell(row, col++).Value = "本家(フォロワー数)";
+
+                    foreach (var tmp in TweetTimeline.Items)
+                    {
+                        col = 1;
+                        row++;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Id;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.User.ScreenName;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.User.FriendsCount;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.User.FollowersCount;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.CreatedAt.DateTime.ToString("yyyy/MM/dd HH:mm:ss");
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.Text;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.FavoriteCount;
+                        book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetCount;
+                        if (tmp.RetweetedStatus != null)
+                        {
+                            book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetedStatus.FavoriteCount;
+                            book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetedStatus.RetweetCount;
+                            book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetedStatus.User.ScreenName;
+                            book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetedStatus.User.FriendsCount;
+                            book.Worksheets.ElementAt(0).Cell(row, col++).Value = tmp.RetweetedStatus.User.FollowersCount;
+                        }
                     }
 
                     book.SaveAs(dialog.FileName);

@@ -264,6 +264,59 @@ namespace ZeikomiAnalyzer.Models
 			}
 		}
 		#endregion
+		#region 直接PV数[DirectPageViews]プロパティ
+		/// <summary>
+		/// 直接PV数[DirectPageViews]プロパティ用変数
+		/// </summary>
+		int _DirectPageViews = 0;
+		/// <summary>
+		/// 直接PV数[DirectPageViews]プロパティ
+		/// </summary>
+		public int DirectPageViews
+		{
+			get
+			{
+				return _DirectPageViews;
+			}
+			set
+			{
+				if (!_DirectPageViews.Equals(value))
+				{
+					_DirectPageViews = value;
+					NotifyPropertyChanged("DirectPageViews");
+				}
+			}
+		}
+		#endregion
+
+		#region リファラーPV数[ReferralPageViews]プロパティ
+		/// <summary>
+		/// リファラーPV数[ReferralPageViews]プロパティ用変数
+		/// </summary>
+		int _ReferralPageViews = 0;
+		/// <summary>
+		/// リファラーPV数[ReferralPageViews]プロパティ
+		/// </summary>
+		public int ReferralPageViews
+		{
+			get
+			{
+				return _ReferralPageViews;
+			}
+			set
+			{
+				if (!_ReferralPageViews.Equals(value))
+				{
+					_ReferralPageViews = value;
+					NotifyPropertyChanged("ReferralPageViews");
+				}
+			}
+		}
+		#endregion
+
+
+
+
 
 		#region 記事の長さ
 		/// <summary>
