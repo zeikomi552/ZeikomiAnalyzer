@@ -659,7 +659,12 @@ namespace ZeikomiAnalyzer.ViewModels
                 Task.Run(() =>
                 {
                     var timeline = TwitterAPI.GetUserTimeLine(this.Config.TwScreenName);
-                    this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
+                           this.TweetTimeline.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                       }));
                 });
             }
             catch (Exception e)
@@ -668,6 +673,34 @@ namespace ZeikomiAnalyzer.ViewModels
             }
         }
         #endregion
+
+
+        #region ツイッターキーワード検索結果[TwitterKeywordSearchResult]プロパティ
+        /// <summary>
+        /// ツイッターキーワード検索結果[TwitterKeywordSearchResult]プロパティ用変数
+        /// </summary>
+        SearchResult _TwitterKeywordSearchResult = new SearchResult();
+        /// <summary>
+        /// ツイッターキーワード検索結果[TwitterKeywordSearchResult]プロパティ
+        /// </summary>
+        public SearchResult TwitterKeywordSearchResult
+        {
+            get
+            {
+                return _TwitterKeywordSearchResult;
+            }
+            set
+            {
+                if (_TwitterKeywordSearchResult == null || !_TwitterKeywordSearchResult.Equals(value))
+                {
+                    _TwitterKeywordSearchResult = value;
+                    NotifyPropertyChanged("TwitterKeywordSearchResult");
+                }
+            }
+        }
+        #endregion
+
+
 
         #region キーワードを指定してツイートを取得
         /// <summary>
@@ -681,8 +714,17 @@ namespace ZeikomiAnalyzer.ViewModels
                 {
                     SearchResult result = null;
                     var timeline = TwitterAPI.GetKeywordTweet(this.TwitterKeyWord, ref result);
-                    this.TwitterSearchResult.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                       new Action(() =>
+                       {
+                           this.TwitterSearchResult.Items = new System.Collections.ObjectModel.ObservableCollection<CoreTweet.Status>(timeline);
+                           this.TwitterKeywordSearchResult = result;
+                       }));
+
                 });
+
+
             }
             catch (Exception e)
             {

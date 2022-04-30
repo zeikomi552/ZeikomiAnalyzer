@@ -338,30 +338,15 @@
 
                             <Grid>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
-                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding TwitterSearchResult.Items}"
-                                  SelectedItem="{Binding TwitterSearchResult.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
-                                        <DataGridTextColumn Header="ツイート日時" Binding="{Binding CreatedAt.LocalDateTime, StringFormat=yyyy/MM/dd(ddd)}"/>
-                                        <DataGridTextColumn Width="200" Header="ツイート内容" Binding="{Binding Text}"/>
-                                        <DataGridTextColumn Header="いいね数" Binding="{Binding FavoriteCount}"/>
-                                        <DataGridTextColumn Header="リツイート数" Binding="{Binding RetweetCount}"/>
-                                        <DataGridTextColumn Header="本家(いいね)" Binding="{Binding RetweetedStatus.FavoriteCount}"/>
-                                        <DataGridTextColumn Header="本家(リツイートカウント)" Binding="{Binding RetweetedStatus.RetweetCount}"/>
-                                        <DataGridTextColumn Header="本家(ScreenName)" Binding="{Binding RetweetedStatus.User.ScreenName}"/>
-                                        <DataGridTextColumn Header="本家(フォロー数)" Binding="{Binding RetweetedStatus.User.FriendsCount}"/>
-                                        <DataGridTextColumn Header="本家(フォロワー数)" Binding="{Binding RetweetedStatus.User.FollowersCount}"/>
-                                        <DataGridTextColumn Width="200" Header="URL" Binding="{Binding Converter={StaticResource CoreTweetStatusToUrlstringConverter}, Mode=OneWay}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel Margin="5" Orientation="Horizontal">
                                         <TextBlock VerticalAlignment="Center" Text="検索キーワード"/>
                                         <TextBlock VerticalAlignment="Center" Text=":"/>
-                                        <TextBox Width="100" Text="{Binding TwitterKeyWord}"/>
+                                        <TextBox TextAlignment="Justify" VerticalAlignment="Center" Width="500" Text="{Binding TwitterKeyWord}" Cursor="IBeam"/>
                                     </StackPanel>
                                     <Button Margin="5" Width="100" Content="ツイート取得" IsEnabled="{Binding IsExecute, Converter={StaticResource InverseBooleanConverter}}" Cursor="Hand">
                                         <b:Interaction.Triggers>
@@ -373,12 +358,32 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock VerticalAlignment="Center" Text="残り"/>
                                         <TextBlock VerticalAlignment="Center" Text=":"/>
-                                        <TextBlock Width="100" VerticalAlignment="Center" Text=""/>
+                                        <TextBlock Width="auto" VerticalAlignment="Center" Text="{Binding TwitterKeywordSearchResult.RateLimit.Remaining}"/>
                                         <TextBlock VerticalAlignment="Center" Text="更新"/>
                                         <TextBlock VerticalAlignment="Center" Text=":"/>
-                                        <TextBlock Width="100" VerticalAlignment="Center" Text=""/>
+                                        <TextBlock Width="auto" VerticalAlignment="Center" Text="{Binding TwitterKeywordSearchResult.RateLimit.Reset.LocalDateTime, Mode=OneWay}"/>
                                     </StackPanel>
-                                    <Button Content="Excel出力" Width="100" Margin="5">
+
+                                </StackPanel>
+                                <DataGrid Grid.Row="1" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding TwitterSearchResult.Items}"
+                                  SelectedItem="{Binding TwitterSearchResult.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="ツイート日時" Binding="{Binding CreatedAt.LocalDateTime, StringFormat=yyyy/MM/dd(ddd)}"/>
+                                        <DataGridTextColumn Width="200" Header="ツイート内容" Binding="{Binding Text}"/>
+                                        <DataGridTextColumn Header="ScreenName" Binding="{Binding User.ScreenName}"/>
+                                        <DataGridTextColumn Header="いいね数" Binding="{Binding FavoriteCount}"/>
+                                        <DataGridTextColumn Header="リツイート数" Binding="{Binding RetweetCount}"/>
+                                        <DataGridTextColumn Header="本家(いいね)" Binding="{Binding RetweetedStatus.FavoriteCount}"/>
+                                        <DataGridTextColumn Header="本家(リツイートカウント)" Binding="{Binding RetweetedStatus.RetweetCount}"/>
+                                        <DataGridTextColumn Header="本家(ScreenName)" Binding="{Binding RetweetedStatus.User.ScreenName}"/>
+                                        <DataGridTextColumn Header="本家(フォロー数)" Binding="{Binding RetweetedStatus.User.FriendsCount}"/>
+                                        <DataGridTextColumn Header="本家(フォロワー数)" Binding="{Binding RetweetedStatus.User.FollowersCount}"/>
+                                        <DataGridTextColumn Width="200" Header="URL" Binding="{Binding Converter={StaticResource CoreTweetStatusToUrlstringConverter}, Mode=OneWay}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel Orientation="Horizontal" Grid.Row="2">
+                                    <Button Content="Excel出力" Width="100" Margin="5" Cursor="Hand">
                                         <b:Interaction.Triggers>
                                             <b:EventTrigger EventName="Click">
                                                 <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelTweetContent"/>
