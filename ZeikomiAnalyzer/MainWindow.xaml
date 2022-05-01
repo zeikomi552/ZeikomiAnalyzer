@@ -372,6 +372,8 @@
                                         <DataGridTextColumn Header="ツイート日時" Binding="{Binding CreatedAt.LocalDateTime, StringFormat=yyyy/MM/dd(ddd)}"/>
                                         <DataGridTextColumn Width="200" Header="ツイート内容" Binding="{Binding Text}"/>
                                         <DataGridTextColumn Header="ScreenName" Binding="{Binding User.ScreenName}"/>
+                                        <DataGridTextColumn Header="ユーザーツイート数" Binding="{Binding User.StatusesCount}"/>
+                                        <DataGridTextColumn Header="ユーザーいいね数" Binding="{Binding User.FavouritesCount}"/>
                                         <DataGridTextColumn Header="いいね数" Binding="{Binding FavoriteCount}"/>
                                         <DataGridTextColumn Header="リツイート数" Binding="{Binding RetweetCount}"/>
                                         <DataGridTextColumn Header="本家(いいね)" Binding="{Binding RetweetedStatus.FavoriteCount}"/>
@@ -386,7 +388,7 @@
                                     <Button Content="Excel出力" Width="100" Margin="5" Cursor="Hand">
                                         <b:Interaction.Triggers>
                                             <b:EventTrigger EventName="Click">
-                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelTweetContent"/>
+                                                <b:CallMethodAction TargetObject="{Binding}" MethodName="SaveExcelKeywordTweetContent"/>
                                             </b:EventTrigger>
                                         </b:Interaction.Triggers>
                                     </Button>

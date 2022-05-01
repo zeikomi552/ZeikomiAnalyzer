@@ -322,6 +322,7 @@ namespace Twapi.Twitter
                 if (tmp != null)
                 {
                     tweet = token.Search.Tweets(q => query, count => 100, max_id => tmp.Id - 1, lang=>"ja");
+
                     result = tweet;
                     ret.AddRange(tweet.ToList<Status>());
                 }
